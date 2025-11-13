@@ -31,7 +31,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Gradle 명령 실행을 위한 권한을 부여합니다
-        run: chmod +x ${{ github.workspace }}/gradlew
+        run: chmod +x ${{ github.workspace }}/gradle
 
       - name: Gradle build를 수행합니다
         run: ${{ github.workspace }}/gradlew build
