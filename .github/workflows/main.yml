@@ -57,12 +57,15 @@ jobs:
           done
           echo "PostGIS connection timeout" && exit 1
 
-      - name: Gradle 빌드 및 테스트 수행
+      - name: Gradle 빌드 수행
+        run: ./gradlew clean assemble --info
+
+      - name: 테스트 실행
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/pinco
           SPRING_DATASOURCE_USERNAME: user
           SPRING_DATASOURCE_PASSWORD: password
-        run: ./gradlew clean build --info
+        run: ./gradlew test --info
 
       - name: 테스트 결과를 PR에 코멘트로 등록
         uses: EnricoMi/publish-unit-test-result-action@v1
