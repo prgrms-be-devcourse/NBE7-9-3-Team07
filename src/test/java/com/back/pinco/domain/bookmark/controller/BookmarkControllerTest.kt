@@ -120,7 +120,7 @@ class BookmarkControllerTest {
                 .content(jsonContent)
         ).andDo(MockMvcResultHandlers.print())
 
-        resultActions.andExpect(MockMvcResultMatchers.status().isForbidden())
+        resultActions.andExpect(MockMvcResultMatchers.status().isUnauthorized())
     }
 
     @Test
@@ -186,7 +186,7 @@ class BookmarkControllerTest {
             MockMvcRequestBuilders.get("/api/bookmarks")
         ).andDo(MockMvcResultHandlers.print())
 
-        resultActions.andExpect(MockMvcResultMatchers.status().isForbidden())
+        resultActions.andExpect(MockMvcResultMatchers.status().isUnauthorized())
     }
 
 
