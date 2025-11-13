@@ -13,23 +13,25 @@ on:
     paths: 'src/**'
 
 jobs:
-  build:
-
+  Test:
     runs-on: ubuntu-latest
+
     services:
-      postgis_db:
-        image: postgis/postgis:16-3.4
+      postgres:
+        image: postgres
+
         env:
-          POSTGRES_DB: pinco
-          POSTGRES_USER: user
           POSTGRES_PASSWORD: password
-        ports:
-          - 5432:5432
+          POSTGRES_USER: user
+          POSTGRES_DB: pinco
+
         options: >-
-          --health-cmd "pg_isready"
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
       - name: 리포지토리를 가져옵니다
@@ -48,12 +50,6 @@ jobs:
         run: chmod +x gradlew
 
       - name: Gradle build를 수행합니다
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://postgis_db:5432/pinco
-
-          SPRING_JPA_HIBERNATE_DDL_AUTO: create
-          SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-          SPRING_JPA_PROPERTIES_HIBERNATE_TEMP_USE_JDBC_METADATA_DEFAULTS: false
         run: ./gradlew build
 
       - name: 테스트 결과를 PR에 코멘트로 등록합니다
