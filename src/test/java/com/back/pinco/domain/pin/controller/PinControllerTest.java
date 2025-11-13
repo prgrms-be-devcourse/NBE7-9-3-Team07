@@ -1000,7 +1000,7 @@ public class PinControllerTest {
 //        // DB 검증
 //        Optional<Likes> likes = likesRepository.findByPinIdAndUserId(pinId, userId);
 //        assertThat(likes).isEmpty();
-    }
+//    }
 
     @Test
     @DisplayName("좋아요 취소 성공 - 좋아요 true")
