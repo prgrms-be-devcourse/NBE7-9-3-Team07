@@ -74,7 +74,7 @@ public class PinController {
                 pinDto
         );
     }
-    //범위로 조회
+    //범위로 조회 - 원
     @Operation(summary = "핀 조회 - 다건 (범위)", description = "범위로 핀을 다건 조회")
     @GetMapping
     public RsData<List<PinDto>> getRadiusPins(
@@ -102,6 +102,44 @@ public class PinController {
         );
     }
 
+    //범위로 조회 - 사각형
+
+
+@Operation(summary = "핀 조회 - 다건 (범위-사각형)", description = "범위로 핀을 다건 조회")
+@GetMapping("/screen")
+public RsData<List<PinDto>> getRectanglePins(
+        @NotNull
+        @Min(-90)
+        @Max(90)
+        @RequestParam double latMax,
+        @NotNull
+        @Min(-180)
+        @Max(180)
+        @RequestParam double lonMax,
+        @NotNull
+        @Min(-90)
+        @Max(90)
+        @RequestParam double latMin,
+        @NotNull
+        @Min(-180)
+        @Max(180)
+        @RequestParam double lonMin
+
+) {
+    User actor = rq.getActor();
+    List<Pin> pins = pinService.findScreenPins(latMax, lonMax, latMin, lonMin, actor);
+
+    List<PinDto> pinDtos = pins.stream()
+            .map(PinDto::new)
+            .collect(Collectors.toList());
+
+    return new RsData<>(
+            "200",
+            "성공적으로 처리되었습니다",
+            pinDtos
+    );
+}
+
     //사용자로 조회
     @Operation(summary = "핀 조회 - 다건 (작성자+연도+월)", description = "작성자로 핀을 다건 조회")
     @GetMapping("/user/{userId}/date")
@@ -128,7 +166,7 @@ public class PinController {
         );
     }
 
-    //사용자로, 날짜로 조회
+    //사용자로 조회
     @Operation(summary = "핀 조회 - 다건 (작성자)", description = "작성자로 핀을 다건 조회")
     @GetMapping("/user/{userId}")
     public RsData<List<PinDto>> getUserPins(
