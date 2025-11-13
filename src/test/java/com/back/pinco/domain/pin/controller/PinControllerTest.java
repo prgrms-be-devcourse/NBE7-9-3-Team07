@@ -240,7 +240,7 @@ public class PinControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(status().is(403));
+                .andExpect(status().is(401));
     }
 
     @Test
