@@ -151,7 +151,7 @@ public class PinControllerTest {
     }
 
     @Test
-    @DisplayName("핀 생성 - 실패 (경도 정보 오류)")
+    @DisplayName("핀 생성 - 실패 (위도 정보 오류)")
     void t1_3() throws Exception {
 
         double lon = 0;
@@ -244,7 +244,7 @@ public class PinControllerTest {
     }
 
     @Test
-    @DisplayName("id로 핀 조회 - 성공")
+    @DisplayName("id로 핀 조회 - 로그인 - 성공")
     void t2_1_1() throws Exception {
 
         Pin pin = pinRepository.findAccessiblePinById(targetId, testUser.getId()).get();
@@ -298,12 +298,28 @@ public class PinControllerTest {
     }
 
     @Test
-    @DisplayName("id로 핀 조회 - 실패 (id가 없음)")
+    @DisplayName("id로 핀 조회 - 로그인 - 실패 (id가 없음)")
     void t2_2() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/pins/%s".formatted(failedTargetId))
                                 .header("Authorization", "Bearer %s %s".formatted(testUser.getApiKey(), jwtToken))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(PinController.class))
+                .andExpect(handler().methodName("getPinById"))
+                .andExpect(jsonPath("$.errorCode").value("1002"))
+                .andExpect(jsonPath("$.msg").exists());
+    }
+
+    @Test
+    @DisplayName("id로 핀 조회 - 비로그인 - 실패 (id가 없음)")
+    void t2_3() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/pins/%s".formatted(failedTargetId))
                 )
                 .andDo(print());
 
@@ -402,8 +418,143 @@ public class PinControllerTest {
         resultActions
                 .andExpect(handler().handlerType(PinController.class))
                 .andExpect(handler().methodName("getRadiusPins"))
-                .andExpect(jsonPath("$.errorCode").value("1003"))
-                .andExpect(jsonPath("$.msg").exists());
+                .andExpect(jsonPath("$.errorCode").value("200"))
+                .andExpect(jsonPath("$.msg").exists())
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    @DisplayName("특정 범위(사각형) 내 좌표 확인 - 로그인 - 사각형")
+    void t3_3_1() throws Exception {
+
+        Pin pin = pinRepository.findAll().get(0);
+        double centerLat = pin.getPoint().getY();
+        double centerLon = pin.getPoint().getX();
+
+        double delta = 0.01; // 대략 1km 정도의 범위
+        double latMax = centerLat + delta;
+        double latMin = centerLat - delta;
+        double lonMax = centerLon + delta;
+        double lonMin = centerLon - delta;
+
+        List<Pin> pins = pinRepository.findScreenPins(latMax, lonMax, latMin, lonMin, testUser.getId());
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/pins/screen")
+                                .param("latMax", String.valueOf(latMax))
+                                .param("latMin", String.valueOf(latMin))
+                                .param("lonMax", String.valueOf(lonMax))
+                                .param("lonMin", String.valueOf(lonMin))
+                                .header("Authorization", "Bearer %s %s".formatted(testUser.getApiKey(), jwtToken))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(PinController.class))
+                .andExpect(handler().methodName("getRectanglePins"))
+                .andExpect(status().isOk());
+
+        // 반환된 데이터의 개수 검증
+        resultActions.andExpect(jsonPath("$.data.length()").value(pins.size()));
+
+        // 개별 요소 검증
+        for (int i = 0; i < pins.size(); i++) {
+            Pin p = pins.get(i);
+            resultActions
+                    .andExpect(jsonPath("$.data[%d].id".formatted(i)).value(p.getId()))
+                    .andExpect(jsonPath("$.data[%d].latitude".formatted(i)).value(p.getPoint().getY()))
+                    .andExpect(jsonPath("$.data[%d].longitude".formatted(i)).value(p.getPoint().getX()))
+                    .andExpect(jsonPath("$.data[%d].pinTags.length()".formatted(i)).value(p.getPinTags().size()))
+                    .andExpect(jsonPath("$.data[%d].createdAt".formatted(i))
+                            .value(matchesPattern(p.getCreatedAt().toString().replaceAll("0+$", "") + ".*")))
+                    .andExpect(jsonPath("$.data[%d].modifiedAt".formatted(i))
+                            .value(matchesPattern(p.getModifiedAt().toString().replaceAll("0+$", "") + ".*")));
+        }
+    }
+
+
+    @Test
+    @DisplayName("특정 지점에서 범위 내 좌표 확인- 비로그인 - 사각형")
+    void t3_3_2() throws Exception {
+
+        Pin pin = pinRepository.findAll().get(0);
+        double centerLat = pin.getPoint().getY();
+        double centerLon = pin.getPoint().getX();
+
+        double delta = 0.01; // 대략 1km 정도의 범위
+        double latMax = centerLat + delta;
+        double latMin = centerLat - delta;
+        double lonMax = centerLon + delta;
+        double lonMin = centerLon - delta;
+
+        List<Pin> pins = pinRepository.findPublicScreenPins(latMax, lonMax, latMin, lonMin);
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/pins/screen")
+                                .param("latMax", String.valueOf(latMax))
+                                .param("latMin", String.valueOf(latMin))
+                                .param("lonMax", String.valueOf(lonMax))
+                                .param("lonMin", String.valueOf(lonMin))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(PinController.class))
+                .andExpect(handler().methodName("getRectanglePins"))
+                .andExpect(status().isOk());
+
+        // 반환된 데이터의 개수 검증
+        resultActions.andExpect(jsonPath("$.data.length()").value(pins.size()));
+
+        // 개별 요소 검증
+        for (int i = 0; i < pins.size(); i++) {
+            Pin p = pins.get(i);
+            resultActions
+                    .andExpect(jsonPath("$.data[%d].id".formatted(i)).value(p.getId()))
+                    .andExpect(jsonPath("$.data[%d].latitude".formatted(i)).value(p.getPoint().getY()))
+                    .andExpect(jsonPath("$.data[%d].longitude".formatted(i)).value(p.getPoint().getX()))
+                    .andExpect(jsonPath("$.data[%d].pinTags.length()".formatted(i)).value(p.getPinTags().size()))
+                    .andExpect(jsonPath("$.data[%d].createdAt".formatted(i))
+                            .value(matchesPattern(p.getCreatedAt().toString().replaceAll("0+$", "") + ".*")))
+                    .andExpect(jsonPath("$.data[%d].modifiedAt".formatted(i))
+                            .value(matchesPattern(p.getModifiedAt().toString().replaceAll("0+$", "") + ".*")));
+        }
+
+    }
+
+    @Test
+    @DisplayName("특정 지점에서 범위 내 핀 확인 - 핀 없음 - 사각형")
+    void t3_4() throws Exception {
+        double centerLat = 0;
+        double centerLon = 0;
+
+        double delta = 0.01; // 대략 1km 정도의 범위
+        double latMax = centerLat + delta;
+        double latMin = centerLat - delta;
+        double lonMax = centerLon + delta;
+        double lonMin = centerLon - delta;
+
+        List<Pin> pins = pinRepository.findPublicScreenPins(latMax, lonMax, latMin, lonMin);
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/pins/screen")
+                                .param("latMax", String.valueOf(latMax))
+                                .param("latMin", String.valueOf(latMin))
+                                .param("lonMax", String.valueOf(lonMax))
+                                .param("lonMin", String.valueOf(lonMin))
+                )
+                .andDo(print());
+
+
+        resultActions
+                .andExpect(handler().handlerType(PinController.class))
+                .andExpect(handler().methodName("getRectanglePins"))
+                .andExpect(jsonPath("$.errorCode").value("200"))
+                .andExpect(jsonPath("$.msg").exists())
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 
 
