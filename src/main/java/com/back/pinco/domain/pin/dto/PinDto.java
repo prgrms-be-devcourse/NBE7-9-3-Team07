@@ -4,6 +4,8 @@ import com.back.pinco.domain.pin.entity.Pin;
 import com.back.pinco.domain.tag.dto.PinTagDto;
 import com.back.pinco.domain.tag.dto.TagDto;
 import com.back.pinco.domain.tag.entity.PinTag;
+import com.back.pinco.domain.tag.entity.Tag;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,7 +17,7 @@ public record PinDto(
         Double longitude,
         String content,
         Long userId,
-        List<TagDto> pinTags,
+        List<String> pinTags,
         int likeCount,
         Boolean isPublic,
         LocalDateTime createdAt,
@@ -30,7 +32,7 @@ public record PinDto(
                 pin.getUser().getId(),
                 pin.getPinTags().stream()
                         .map(PinTag::getTag)
-                        .map(tag -> new TagDto(tag.getId(), tag.getKeyword(), tag.getCreatedAt()))
+                        .map(Tag::getKeyword)
                         .collect(Collectors.toList()),
                 pin.getLikeCount(),
                 pin.getIsPublic(),
