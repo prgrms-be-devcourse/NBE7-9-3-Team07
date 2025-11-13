@@ -48,7 +48,13 @@ jobs:
       - name: Gradle 명령 실행을 위한 권한을 부여합니다
         run: chmod +x gradlew
 
-      - name: Gradle build를 수행합니다
+      - name: Gradle build를 수행합니다 (DB 연결 및 DDL 설정 오버라이드)
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/pinco
+          SPRING_JPA_HIBERNATE_DDL_AUTO: create
+          SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+          SPRING_JPA_PROPERTIES_HIBERNATE_TEMP_USE_JDBC_METADATA_DEFAULTS: false
+
         run: ./gradlew build
 
       - name: 테스트 결과를 PR에 코멘트로 등록합니다
