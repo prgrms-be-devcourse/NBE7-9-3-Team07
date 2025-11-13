@@ -1,0 +1,20 @@
+name: "✨ Feature"
+description: "새로운 기능 추가"
+labels: ["feat"]
+body:
+  - type: textarea
+    attributes:
+      label: 이슈 배경
+      description: 어떤 기능을 추가하고 싶은지 작성해주세요.
+      placeholder: 예) 상품 검색 기능 추가
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 이슈 내용
+      description: 구체적으로 어떻게 동작해야 하는지 작성해주세요.
+      placeholder: |
+        - 상품명으로 검색 가능
+        - 카테고리별 필터링
+    validations:
+      required: false

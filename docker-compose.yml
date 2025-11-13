@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgis_db:
+    # PostGIS 공식 이미지 사용
+    image: postgis/postgis:16-3.4
+    container_name: pinco_postgis
+    restart: always
+
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pinco
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - pinco_data:/var/lib/postgresql/data
+
+volumes:
+  pinco_data:
+    # 이 볼륨은 도커가 관리하며 컨테이너가 삭제되어도 데이터가 유지됩니다.
+    external: false
