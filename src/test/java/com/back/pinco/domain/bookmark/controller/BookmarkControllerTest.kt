@@ -21,12 +21,19 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class BookmarkControllerTest @Autowired constructor(
-    private val mvc: MockMvc,
-    private val userRepository: UserRepository,
-    private val pinRepository: PinRepository,
-    private val bookmarkRepository: BookmarkRepository
-) {
+class BookmarkControllerTest {
+
+    @Autowired
+    private lateinit var mvc: MockMvc
+
+    @Autowired
+    private lateinit var userRepository: UserRepository
+
+    @Autowired
+    private lateinit var pinRepository: PinRepository
+
+    @Autowired
+    private lateinit var bookmarkRepository: BookmarkRepository
 
     private val failedTargetId = Long.MAX_VALUE
 
