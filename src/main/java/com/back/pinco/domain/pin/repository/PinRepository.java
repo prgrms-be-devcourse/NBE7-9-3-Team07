@@ -34,7 +34,29 @@ public interface PinRepository extends JpaRepository<Pin,Long> {
             @Param("radiusInMeters") Double radiusInMeters
     );
 
+    String Rectangle_BASE_QUERY =
+            "SELECT p.* FROM pins p " +
+                    "WHERE p.is_deleted = false " +
+                    "AND p.point && ST_MakeEnvelope(" +
+                    ":lonMin, " +
+                    ":latMin, " +
+                    ":lonMax, " +
+                    ":latMax" +
+                    ", " + GeometryUtil.SRID +
+                    ") ";
 
+    @Query(value = Rectangle_BASE_QUERY + " AND p.is_public = true", nativeQuery = true)
+    List<Pin> findPublicScreenPins(
+            @Param("latMax") Double latMax,
+            @Param("lonMax") Double lonMax,
+            @Param("latMin") Double latMin,
+            @Param("lonMin") Double lonMin
+    );
+    @Query(value = Rectangle_BASE_QUERY + " AND (p.user_id = :userId OR p.is_public = true)", nativeQuery = true)
+    List<Pin> findScreenPins(@Param("latMax") Double latMax,
+                             @Param("lonMax") Double lonMax,
+                             @Param("latMin") Double latMin,
+                             @Param("lonMin") Double lonMin,@Param("userId") Long userId);
 
 
     // 특정 사용자의 핀 조회
