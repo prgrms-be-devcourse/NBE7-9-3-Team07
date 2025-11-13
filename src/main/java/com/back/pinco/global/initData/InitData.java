@@ -81,9 +81,6 @@ public class InitData {
         bookmarkService.addBookmark(user2.getId(), pin8.getId());
         bookmarkService.addBookmark(user2.getId(), pin9.getId());
         bookmarkService.addBookmark(user1.getId(), pin9.getId());
-        bookmarkService.addBookmark(user3.getId(), pin10.getId());
-        bookmarkService.addBookmark(user3.getId(), pin11.getId());
-
 
         // 좋아요 등록
         // A(2), B(2), C(1), D(0), E(1)
