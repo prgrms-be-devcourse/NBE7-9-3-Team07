@@ -12,10 +12,6 @@ on:
       - dev
     paths: 'src/**'
 
-defaults:
-  run:
-    working-directory: src
-
 jobs:
   build:
 
