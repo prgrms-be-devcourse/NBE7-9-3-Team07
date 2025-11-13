@@ -973,11 +973,11 @@ public class PinControllerTest {
         assertThat(likes).isEmpty();
     }
 
-    @Test
-    @DisplayName("좋아요 저장 실패 - 존재하지 않는 사용자 - 테스트 불가")
-    @Transactional
-    void likesCreatefailUserId() throws Exception {
-        // 인증 도입으로 존재하지 않는 사용자 테스트 불가
+//    @Test
+//    @DisplayName("좋아요 저장 실패 - 존재하지 않는 사용자 - 테스트 불가")
+//    @Transactional
+//    void likesCreatefailUserId() throws Exception {
+//        // 인증 도입으로 존재하지 않는 사용자 테스트 불가
 //        // given
 //        Long pinId = 2L;
 //        Long userId = 999L;

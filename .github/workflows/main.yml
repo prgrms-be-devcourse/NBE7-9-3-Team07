@@ -14,8 +14,22 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
+    services:
+      postgis_db:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: pinco
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U user -d pinco"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       - name: 리포지토리를 가져옵니다
@@ -33,16 +47,30 @@ jobs:
       - name: Gradle 명령 실행을 위한 권한을 부여합니다
         run: chmod +x gradlew
 
-      - name: Gradle build를 수행합니다
-        run: ./gradlew build
+      - name : DB 준비 대기 (PostGIS)
+        run: |  
+            echo "Waiting for PostGIS to be ready..."
+            for i in {1..20}; do
+              nc -z localhost 5432 && echo "PostGIS is up!" && exit 0
+              echo "Waiting ($i)..."
+              sleep 3
+            done
+            echo "PostGIS connection timeout" && exit 1
 
-      - name: 테스트 결과를 PR에 코멘트로 등록합니다
+      - name: Gradle 빌드 및 테스트 수행
+        env:
+            SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/pinco
+            SPRING_DATASOURCE_USERNAME: user
+            SPRING_DATASOURCE_PASSWORD: password
+        run: ./gradlew clean build --info
+
+      - name: 테스트 결과를 PR에 코멘트로 등록
         uses: EnricoMi/publish-unit-test-result-action@v1
         if: always()
         with:
           files: '**/build/test-results/test/TEST-*.xml'
 
-      - name: 테스트 실패 시, 실패한 코드 라인에 Check 코멘트를 등록합니다
+      - name: 테스트 실패 시, 실패한 코드 라인에 Check 코멘트를 등록
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
