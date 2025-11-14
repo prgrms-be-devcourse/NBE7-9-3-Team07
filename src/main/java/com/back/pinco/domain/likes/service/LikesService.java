@@ -81,8 +81,8 @@ public class LikesService {
 
 
     private Pin validatePin(Long pinId, Long userId) {
-        Pin pin = pinRepository.findAccessiblePinById(pinId, userId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.LIKES_INVALID_PIN_INPUT));
+        Pin pin = pinRepository.findAccessiblePinById(pinId, userId);
+        if(pin ==null ) throw new ServiceException(ErrorCode.LIKES_INVALID_PIN_INPUT);
         return pin;
     }
 
