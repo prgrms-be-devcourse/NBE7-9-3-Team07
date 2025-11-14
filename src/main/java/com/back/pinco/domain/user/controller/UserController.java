@@ -93,7 +93,8 @@ public class UserController {
         authService.logout(req, res);
         return new RsData<>(
                 "200",
-                "로그아웃 성공"
+                "로그아웃 성공",
+                null
         );
     }
 
@@ -147,7 +148,8 @@ public class UserController {
         userService.editUserInfo(currentUser.getId(), reqBody.newUserName(), reqBody.newPassword());
         return new RsData<>(
                 "200",
-                "회원정보 수정 완료"
+                "회원정보 수정 완료",
+                null
         );
     }
 
@@ -163,7 +165,8 @@ public class UserController {
         rq.deleteCookie("apiKey");
         return new RsData<>(
                 "200",
-                "회원 탈퇴가 완료되었습니다."
+                "회원 탈퇴가 완료되었습니다.",
+                null
         );
     }
 
