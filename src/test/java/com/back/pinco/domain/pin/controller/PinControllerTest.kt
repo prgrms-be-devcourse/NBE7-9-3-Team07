@@ -1371,7 +1371,7 @@ class PinControllerTest {
         val pinId = 1L
 
         val userIds = likesRepository.findUsersByPinId(pinId)
-            .map { it.id.toInt() }
+            .map { it.id!!.toInt() }
             .toTypedArray()
 
 
@@ -1408,7 +1408,7 @@ class PinControllerTest {
         val pinId = 4L
 
         val userIds = likesRepository.findUsersByPinId(pinId)
-            .map { it.id.toInt() }
+            .map { it.id!!.toInt() }
             .toTypedArray()
 
 

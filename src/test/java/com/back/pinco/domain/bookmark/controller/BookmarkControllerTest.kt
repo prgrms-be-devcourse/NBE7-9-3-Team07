@@ -38,7 +38,7 @@ class BookmarkControllerTest {
     private val failedTargetId = Long.MAX_VALUE
 
     private fun getAuthHeader(user: User): String {
-        return "Bearer ${user.getApiKey()}"
+        return "Bearer ${user.apiKey}"
     }
 
     private fun findPinByContent(content: String): Pin {
