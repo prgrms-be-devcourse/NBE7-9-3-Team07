@@ -35,7 +35,7 @@ public record PinDto(
                         .map(Tag::getKeyword)
                         .collect(Collectors.toList()),
                 pin.getLikeCount(),
-                pin.getIsPublic(),
+                pin.isPublic(),
                 pin.getCreatedAt(),
                 pin.getModifiedAt()
         );
