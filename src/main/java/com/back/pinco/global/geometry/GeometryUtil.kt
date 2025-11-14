@@ -15,6 +15,7 @@ object GeometryUtil {
      * @param longitude 경도
      * @param latitude  위도
      */
+    // TODO: 이후 @JvmStatic 삭제
     @JvmStatic
     fun createPoint(longitude: Double, latitude: Double): Point =
         geometryFactory.createPoint(Coordinate(longitude, latitude))
