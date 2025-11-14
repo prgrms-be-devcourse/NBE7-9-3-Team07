@@ -21,7 +21,7 @@ abstract class BaseEntity {
 
     @Column(name = "create_by")
     @CreatedBy
-    var createdBy: Long = 0
+    var createdBy: Long? = null
 
     @Column(name = "modified_at")
     @LastModifiedDate
@@ -30,5 +30,5 @@ abstract class BaseEntity {
 
     @Column(name = "modified_by")
     @LastModifiedBy
-    var modifiedBy: Long = 0
+    var modifiedBy: Long? = null
 }
