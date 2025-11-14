@@ -1,34 +1,31 @@
-package com.back.pinco.global.exception;
+package com.back.pinco.global.exception
 
-public sealed interface ValidationField
-        permits LatitudeField, LongitudeField, ContentField, UnknownField {
+sealed interface ValidationField {
 
-    String name();
-
-    static ValidationField from(String fieldName) {
-        return switch (fieldName) {
-            case "latitude" -> new LatitudeField();
-            case "longitude" -> new LongitudeField();
-            case "content" -> new ContentField();
-            default -> new UnknownField(fieldName);
-        };
+    companion object {
+        fun from(fieldName: String): ValidationField = when (fieldName) {
+                "latitude" -> LatitudeField
+                "longitude" -> LongitudeField
+                "content" -> ContentField
+                else -> UnknownField(fieldName)
+        }
     }
+
+    fun name(): String
 }
 
-final class LatitudeField implements ValidationField {
-    @Override public String name() { return "latitude"; }
+data object LatitudeField : ValidationField {
+    override fun name(): String = "latitude"
 }
 
-final class LongitudeField implements ValidationField {
-    @Override public String name() { return "longitude"; }
+data object LongitudeField : ValidationField {
+    override fun name(): String = "longitude"
 }
 
-final class ContentField implements ValidationField {
-    @Override public String name() { return "content"; }
+data object ContentField : ValidationField {
+    override fun name(): String = "content"
 }
 
-final class UnknownField implements ValidationField {
-    private final String name;
-    public UnknownField(String name) { this.name = name; }
-    @Override public String name() { return name; }
+data class UnknownField(private val name: String) : ValidationField {
+    override fun name() : String = name
 }
