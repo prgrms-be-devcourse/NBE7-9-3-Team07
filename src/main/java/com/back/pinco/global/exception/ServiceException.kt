@@ -1,17 +1,9 @@
-package com.back.pinco.global.exception;
+package com.back.pinco.global.exception
 
-import lombok.Getter;
+import lombok.Getter
 
 @Getter
-public class ServiceException extends RuntimeException {
-
-    private final ErrorCode errorCode;
-
-    /**
-     * @param errorCode ErrorCode.ENUM 값
-     */
-    public ServiceException(ErrorCode errorCode) {
-        super("%d : %s".formatted(errorCode.getCode(), errorCode.getMessage()));
-        this.errorCode = errorCode;
-    }
+data class ServiceException(
+    val errorCode: ErrorCode
+) : RuntimeException("${errorCode.code}: ${errorCode.message}") {
 }

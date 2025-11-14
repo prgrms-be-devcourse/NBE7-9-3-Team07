@@ -1,53 +1,52 @@
-package com.back.pinco.global.exception;
+package com.back.pinco.global.exception
 
-import com.back.pinco.global.rsData.RsData;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import com.back.pinco.global.rsData.RsData
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+class GlobalExceptionHandler {
 
-    @ExceptionHandler(ServiceException.class)
-    public ResponseEntity<RsData<Void>> handleServiceException(ServiceException e) {
-        var errorCode = e.getErrorCode();
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(new RsData<>(
-                        String.valueOf(errorCode.getCode()),
-                        errorCode.getMessage()
-                ));
+    @ExceptionHandler(ServiceException::class)
+    fun handleServiceException(e: ServiceException): ResponseEntity<RsData<Unit>> {
+        val errorCode = e.errorCode
+
+        return ResponseEntity.status(errorCode.status).body(
+                RsData(
+                    errorCode.code.toString(), errorCode.message
+                )
+            )
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<RsData<Void>> handlePinValidationException(MethodArgumentNotValidException e) {
-        FieldError firstError = e.getBindingResult().getFieldError();
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handlePinValidationException(e: MethodArgumentNotValidException): ResponseEntity<RsData<Unit>> {
+        val firstError = e.bindingResult.fieldError
+
         if (firstError == null) {
             return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new RsData<>("400", "잘못된 요청입니다."));
+                .status(HttpStatus.BAD_REQUEST)
+                .body(RsData("400", "잘못된 요청입니다."))
         }
 
-        ValidationField field = ValidationField.from(firstError.getField());
+        val field = ValidationField.from(firstError.field)
 
-        ErrorCode errorCode = switch (field) {
-            case LatitudeField ignored -> ErrorCode.INVALID_PIN_LATITUDE;
-            case LongitudeField ignored -> ErrorCode.INVALID_PIN_LONGITUDE;
-            case ContentField ignored -> ErrorCode.INVALID_PIN_CONTENT;
-            default -> ErrorCode.INVALID_VALUE;
-        };
+        val errorCode = when (field) {
+            is LatitudeField -> ErrorCode.INVALID_PIN_LATITUDE
+            is LongitudeField -> ErrorCode.INVALID_PIN_LONGITUDE
+            is ContentField -> ErrorCode.INVALID_PIN_CONTENT
+            is UnknownField -> ErrorCode.INVALID_VALUE
+        }
 
         return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(new RsData<>(
-                        String.valueOf(errorCode.getCode()),
-                        errorCode.getMessage()
-                ));
-    }
-
-    //TODO : 다른 검증 값 오류도 정의하면 좋을듯
-
+            .status(errorCode.status)
+            .body(
+                RsData(
+                    errorCode.code.toString(),
+                    errorCode.message
+                )
+            )
+    } //TODO : 다른 검증 값 오류도 정의하면 좋을듯
 }

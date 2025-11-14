@@ -90,12 +90,12 @@ class SecurityConfig (
         response.writer.write(
             """
             {
-              "errorCode": "%s",
-              "msg": "%s",
+              "errorCode": "${code.code}",
+              "msg": "${code.message}",
               "data": null
             }
             
-            """.trimIndent().formatted(code.code, code.message)
+            """
         )
     }
 
@@ -113,12 +113,12 @@ class SecurityConfig (
         response.writer.write(
             """
             {
-              "errorCode": "%s",
-              "msg": "%s",
+              "errorCode": "${code.code}",
+              "msg": "${code.message}",
               "data": null
             }
             
-            """.trimIndent().formatted(code.code, code.message)
+            """
         )
     }
 }
