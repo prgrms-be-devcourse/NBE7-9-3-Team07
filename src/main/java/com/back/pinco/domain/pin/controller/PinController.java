@@ -1,7 +1,7 @@
 package com.back.pinco.domain.pin.controller;
 
 import com.back.pinco.domain.bookmark.dto.BookmarkDto;
-import com.back.pinco.domain.bookmark.dto.addBookmarkRequest;
+import com.back.pinco.domain.bookmark.dto.AddBookmarkRequest;
 import com.back.pinco.domain.bookmark.service.BookmarkService;
 import com.back.pinco.domain.likes.dto.*;
 import com.back.pinco.domain.likes.service.LikesService;

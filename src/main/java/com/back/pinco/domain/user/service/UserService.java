@@ -275,7 +275,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<PinDto> bookmarkList() {
         List<PinDto> bookmarkList = getMyBookmarks().stream()
-                .map(BookmarkDto::pin)
+                .map(BookmarkDto::getPin)
                 .toList();
         return bookmarkList;
     }
