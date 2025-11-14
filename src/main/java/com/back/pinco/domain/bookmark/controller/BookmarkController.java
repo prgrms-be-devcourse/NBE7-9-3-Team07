@@ -5,6 +5,7 @@ import com.back.pinco.domain.bookmark.service.BookmarkService;
 import com.back.pinco.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kotlin.Unit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import com.back.pinco.global.rq.Rq;
@@ -40,7 +41,8 @@ public class BookmarkController {
 
         return new RsData<>(
                 "200",
-                "성공적으로 처리되었습니다."
+                "성공적으로 처리되었습니다.",
+                null
         );
     }
 
@@ -52,7 +54,8 @@ public class BookmarkController {
 
         return new RsData<>(
                 "200",
-                "성공적으로 처리되었습니다."
+                "성공적으로 처리되었습니다.",
+                null
         );
     }
 
