@@ -1,10 +1,14 @@
-package com.back.pinco.global.exception;
+package com.back.pinco.global.exception
 
-import lombok.Getter;
-import org.springframework.http.HttpStatus;
+import lombok.Getter
+import org.springframework.http.HttpStatus
 
 @Getter
-public enum ErrorCode {
+enum class ErrorCode(
+    val code: Int,
+    val status: HttpStatus,
+    val message: String
+) {
 
     // 공통 0000번대
     SUCCESS(200, HttpStatus.OK, "성공적으로 처리되었습니다."),
@@ -71,18 +75,5 @@ public enum ErrorCode {
     LIKES_UPDATE_PIN_FAILED(5005, HttpStatus.NOT_FOUND, "좋아요 갱신 중 오류가 발생했습니다."),
     LIKES_NOT_FOUND(5006, HttpStatus.NOT_FOUND, "존재하지 않는 좋아요입니다."),
     ;
-
-
-
-    private final int code;
-    private final HttpStatus status;
-    private final String message;
-
-    ErrorCode(int code, HttpStatus status, String message) {
-        this.code = code;
-        this.status = status;
-        this.message = message;
-    }
-
 
 }
