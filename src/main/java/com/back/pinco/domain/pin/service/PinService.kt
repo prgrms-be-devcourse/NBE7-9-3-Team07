@@ -1,7 +1,7 @@
 package com.back.pinco.domain.pin.service
 
-import com.back.pinco.domain.pin.dto.PinCreateRequest
-import com.back.pinco.domain.pin.dto.PinUpdateRequest
+import com.back.pinco.domain.pin.dto.CreatePinRequest
+import com.back.pinco.domain.pin.dto.UpdatePinContentRequest
 import com.back.pinco.domain.pin.entity.Pin
 import com.back.pinco.domain.pin.repository.PinRepository
 import com.back.pinco.domain.user.entity.User
@@ -25,7 +25,7 @@ class PinService(private val pinRepository: PinRepository) {
     fun count(): Long = pinRepository.count()
 
 
-    fun write(actor: User?, pinReqbody: PinCreateRequest): Pin {
+    fun write(actor: User?, pinReqbody: CreatePinRequest): Pin {
         val point = createPoint(pinReqbody.longitude, pinReqbody.latitude)
         try {
             val pin = Pin(point, validateUser(actor), pinReqbody.content)
@@ -101,7 +101,7 @@ class PinService(private val pinRepository: PinRepository) {
     }
 
     @Transactional
-    fun update(actor: User?, pinId: Long, updatePinContentRequest: PinUpdateRequest): Pin {
+    fun update(actor: User?, pinId: Long, updatePinContentRequest: UpdatePinContentRequest): Pin {
         val pin = pinRepository.findByIdOrNull(pinId)?: throw ServiceException(ErrorCode.PIN_NOT_FOUND)
 
         if (validateUserID(pin.user) == validateUserID(actor)) {

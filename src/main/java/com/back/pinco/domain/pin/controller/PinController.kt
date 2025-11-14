@@ -7,9 +7,9 @@ import com.back.pinco.domain.likes.dto.PinLikedUserResponse
 import com.back.pinco.domain.likes.dto.PinLikesRequest
 import com.back.pinco.domain.likes.dto.PinLikesResponse
 import com.back.pinco.domain.likes.service.LikesService
-import com.back.pinco.domain.pin.dto.PinCreateRequest
+import com.back.pinco.domain.pin.dto.CreatePinRequest
 import com.back.pinco.domain.pin.dto.PinDto
-import com.back.pinco.domain.pin.dto.PinUpdateRequest
+import com.back.pinco.domain.pin.dto.UpdatePinContentRequest
 import com.back.pinco.domain.pin.service.PinService
 import com.back.pinco.domain.user.entity.User
 import com.back.pinco.domain.user.service.UserService
@@ -45,7 +45,7 @@ class PinController(
     fun createPin(
         @RequestBody
         @Valid
-        pinReqbody: PinCreateRequest
+        pinReqbody: CreatePinRequest
     ): RsData<PinDto> {
 
         val pin = pinService.write(rq.actor, pinReqbody)
@@ -211,7 +211,7 @@ class PinController(
 
         @RequestBody
         @Valid
-        putPinReqbody: PinUpdateRequest
+        putPinReqbody: UpdatePinContentRequest
 
     ): RsData<PinDto> {
         val pin = pinService.update(rq.actor, pinId, putPinReqbody)
