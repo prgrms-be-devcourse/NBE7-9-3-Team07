@@ -16,12 +16,11 @@ import java.time.LocalDateTime
 abstract class BaseEntity {
     @Column(name = "create_at", nullable = false, updatable = false)
     @CreatedDate
-    var createdAt: LocalDateTime? = null
-        protected set
+    val createdAt: LocalDateTime? = null
 
     @Column(name = "create_by")
     @CreatedBy
-    var createdBy: Long? = null
+    val createdBy: Long? = null
 
     @Column(name = "modified_at")
     @LastModifiedDate
