@@ -1,98 +1,97 @@
-package com.back.pinco.global.security;
+package com.back.pinco.global.security
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
-import java.util.Map;
+import io.jsonwebtoken.JwtException
+import io.jsonwebtoken.JwtParser
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.security.Keys
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+import java.nio.charset.StandardCharsets
+import java.security.Key
+import java.util.*
 
 @Component
-public class JwtTokenProvider {
+class JwtTokenProvider(
+    @Value("\${custom.jwt.secret}") secret: String,
+    @Value("\${custom.jwt.accessExpireSeconds}") accessExpireSeconds: Long,
+    @Value("\${custom.jwt.refreshExpireSeconds}") refreshExpireSeconds: Long,
 
-    private final Key key;                 // 서명/검증용 키(한 번 생성 후 재사용)
-    private final long accessExpMs;        // 액세스 토큰 만료(ms)
-    private final long refreshExpMs;       // 리프레시 토큰 만료(ms)
-
-    public JwtTokenProvider(
-            @Value("${custom.jwt.secret}") String secret,
-            @Value("${custom.jwt.accessExpireSeconds}") long accessExpireSeconds,
-            @Value("${custom.jwt.refreshExpireSeconds}") long refreshExpireSeconds
-    ) {
-        // HS256은 32바이트 이상 권장
-        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.accessExpMs = accessExpireSeconds * 1000L;
-        this.refreshExpMs = refreshExpireSeconds * 1000L;
-    }
+) {
+    // HS256은 32바이트 이상 권장
+    private val key: Key = Keys.hmacShaKeyFor(secret.toByteArray(StandardCharsets.UTF_8)) // 서명/검증용 키(한 번 생성 후 재사용)
+    private val accessExpMs = accessExpireSeconds * 1000L // 액세스 토큰 만료(ms)
+    private val refreshExpMs = refreshExpireSeconds * 1000L // 리프레시 토큰 만료(ms)
 
     // 토큰 발급
-    public String generateAccessToken(Long id, String email, String userName) {
-        return build(accessExpMs, Map.of(
+    fun generateAccessToken(id: Long?, email: String?, userName: String?): String {
+        return build(
+            accessExpMs, java.util.Map.of<String, Any?>(
                 "id", id,
                 "email", email,
                 "userName", userName,
                 "role", "ROLE_USER"
-        ));
+            )
+        )
     }
 
-    public String generateRefreshToken(Long id) {
-        return build(refreshExpMs, Map.of("id", id));
+    fun generateRefreshToken(id: Long?): String {
+        return build(refreshExpMs, java.util.Map.of<String, Any?>("id", id))
     }
 
-    private String build(long expMs, Map<String, Object> claims) {
-        Date now = new Date();
+    private fun build(expMs: Long, claims: Map<String, Any?>): String {
+        val now = Date()
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(String.valueOf(claims.get("id")))
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + expMs))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+            .setClaims(claims)
+            .setSubject(claims["id"].toString())
+            .setIssuedAt(now)
+            .setExpiration(Date(now.time + expMs))
+            .signWith(key, SignatureAlgorithm.HS256)
+            .compact()
     }
 
     // 토큰 검증, 파싱
-    public boolean isValid(String token) {
+    fun isValid(token: String?): Boolean {
         try {
-            parser().parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            parser().parseClaimsJws(token)
+            return true
+        } catch (e: JwtException) {
+            return false
+        } catch (e: IllegalArgumentException) {
+            return false
         }
     }
 
-    public Long getUserId(String token) {
-        return Long.valueOf(parser().parseClaimsJws(token).getBody().getSubject());
+    fun getUserId(token: String?): Long {
+        return parser().parseClaimsJws(token).body.subject.toLong()
     }
 
-    public Map<String, Object> payloadOrNull(String token) {
+    fun payloadOrNull(token: String?): Map<String, Any>? {
         try {
-            Claims c = parser().parseClaimsJws(token).getBody();
-            return Map.of(
-                    "id", Long.valueOf(c.getSubject()),
-                    "email", c.get("email", String.class),
-                    "userName", c.get("userName", String.class),
-                    "role", c.getOrDefault("role", "ROLE_USER")
-            );
-        } catch (Exception e) {
-            return null;
+            val c = parser().parseClaimsJws(token).body
+            return java.util.Map.of(
+                "id", c.subject.toLong(),
+                "email", c.get("email", String::class.java),
+                "userName", c.get("userName", String::class.java),
+                "role", c.getOrDefault("role", "ROLE_USER")
+            )
+        } catch (e: Exception) {
+            return null
         }
     }
 
-    private JwtParser parser() {
-        return Jwts.parserBuilder().setSigningKey(key).build();
+    private fun parser(): JwtParser {
+        return Jwts.parserBuilder().setSigningKey(key).build()
     }
 
     // 남은 토큰 유효 시간
-    public long getRemainingValidityMillis(String token) {
+    fun getRemainingValidityMillis(token: String?): Long {
         try {
-            Date exp = parser().parseClaimsJws(token).getBody().getExpiration();
-            long now = System.currentTimeMillis();
-            return (exp == null || exp.getTime() <= now) ? 0L : (exp.getTime() - now);
-        } catch (Exception e) {
-            return 0L;
+            val exp = parser().parseClaimsJws(token).body.expiration
+            val now = System.currentTimeMillis()
+            return if ((exp == null || exp.time <= now)) 0L else (exp.time - now)
+        } catch (e: Exception) {
+            return 0L
         }
     }
 }
