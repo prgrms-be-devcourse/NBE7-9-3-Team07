@@ -42,4 +42,8 @@ public class Tag extends BaseEntity {
         this.keyword = keyword;
     }
 
+    public String getKeyword() {
+        return keyword;
+    }
+
 }
