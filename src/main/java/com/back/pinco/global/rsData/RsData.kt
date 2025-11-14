@@ -1,26 +1,15 @@
-package com.back.pinco.global.rsData;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+package com.back.pinco.global.rsData
 
-@AllArgsConstructor
-@Getter
-public class RsData<T> {
+import com.fasterxml.jackson.annotation.JsonIgnore
+import lombok.AllArgsConstructor
+import lombok.Getter
 
-    private String errorCode;
-    private String msg;
-    private T data;
-
-    public RsData(String errorCode, String msg) {
-        this.errorCode = errorCode;
-        this.msg = msg;
-        this.data = null;
-    }
-
-    @JsonIgnore
-    public int getStatusCode() {
-        String statusCode = errorCode.split("-")[0];
-        return Integer.parseInt(statusCode);
-    }
-
+data class RsData<T>(
+    private val errorCode: String,
+    private val msg: String,
+    private val data: T? = null
+) {
+    @get:JsonIgnore
+    val statusCode: Int
+        get() = errorCode.substringBefore("-").toInt();
 }
