@@ -51,7 +51,7 @@ class BookmarkControllerTest {
     fun t1_1() {
         val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
         val pinC = findPinByContent("청계천 산책로 발견 👣")
-        val targetPinId = pinC.getId()
+        val targetPinId = pinC.id
 
         val jsonContent: String = """
                                 {
@@ -80,7 +80,7 @@ class BookmarkControllerTest {
     fun t1_2() {
         val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
         val pinA = findPinByContent("서울 시청 근처 카페 ☕")
-        val targetPinId = pinA.getId()
+        val targetPinId = pinA.id
 
         val jsonContent: String = """
                                 {
@@ -105,7 +105,7 @@ class BookmarkControllerTest {
     @DisplayName("t1_3. 북마크 생성 실패 (인증되지 않은 사용자)")
     fun t1_3() {
         val pinA = findPinByContent("서울 시청 근처 카페 ☕")
-        val targetPinId = pinA.getId()
+        val targetPinId = pinA.id
 
         val jsonContent: String = """
                                 {
@@ -197,7 +197,7 @@ class BookmarkControllerTest {
         val pinA = findPinByContent("서울 시청 근처 카페 ☕")
         val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA).orElseThrow()
 
-        val targetBookmarkId = bookmark1A.getId()
+        val targetBookmarkId = bookmark1A.id
 
         val resultActions = mvc.perform(
             MockMvcRequestBuilders.delete("/api/bookmarks/{bookmarkId}", targetBookmarkId)
@@ -207,8 +207,8 @@ class BookmarkControllerTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("200"))
 
-        val deletedBookmark = bookmarkRepository.findById(targetBookmarkId).orElseThrow()
-        Assertions.assertThat(deletedBookmark.getDeleted()).isTrue()
+        val deletedBookmark = bookmarkRepository.findById(targetBookmarkId!!).orElseThrow()
+        Assertions.assertThat(deletedBookmark.deleted).isTrue()
     }
 
     @Test
@@ -234,7 +234,7 @@ class BookmarkControllerTest {
         val pinA = findPinByContent("서울 시청 근처 카페 ☕")
         val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA).orElseThrow()
 
-        val targetBookmarkId = bookmark1A.getId()
+        val targetBookmarkId = bookmark1A.id
 
         // user2가 user1의 북마크 삭제 시도
         val resultActions = mvc.perform(
@@ -260,7 +260,7 @@ class BookmarkControllerTest {
         bookmark1A.setDeleted()
         bookmarkRepository.save(bookmark1A)
 
-        val targetBookmarkId = bookmark1A.getId()
+        val targetBookmarkId = bookmark1A.id
 
         val resultActions = mvc.perform(
             MockMvcRequestBuilders.patch("/api/bookmarks/{bookmarkId}", targetBookmarkId)
@@ -270,8 +270,8 @@ class BookmarkControllerTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("200"))
 
-        val restored = bookmarkRepository.findById(targetBookmarkId).orElseThrow()
-        Assertions.assertThat(restored.getDeleted()).isFalse()
+        val restored = bookmarkRepository.findById(targetBookmarkId!!).orElseThrow()
+        Assertions.assertThat(restored.deleted).isFalse()
     }
 
     @Test
@@ -302,7 +302,7 @@ class BookmarkControllerTest {
         bookmark1A.setDeleted()
         bookmarkRepository.save(bookmark1A)
 
-        val targetBookmarkId = bookmark1A.getId()
+        val targetBookmarkId = bookmark1A.id
 
         // user2가 user1의 북마크 복원 시도
         val resultActions = mvc.perform(
