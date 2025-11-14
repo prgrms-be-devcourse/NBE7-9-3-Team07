@@ -258,13 +258,13 @@ public class UserService {
 
         // 공개: isPublic == true
         List<PinDto> publicDtos = accessible.stream()
-                .filter(p -> Boolean.TRUE.equals(p.getIsPublic()))
+                .filter(p -> Boolean.TRUE.equals(p.isPublic()))
                 .map(PinDto::new)
                 .toList();
 
         // 비공개: isPublic != true && "내 것"만
         List<PinDto> privateDtos = accessible.stream()
-                .filter(p -> !Boolean.TRUE.equals(p.getIsPublic()))
+                .filter(p -> !Boolean.TRUE.equals(p.isPublic()))
                 .filter(p -> p.getUser() != null && p.getUser().getId().equals(user.getId()))
                 .map(PinDto::new)
                 .toList();

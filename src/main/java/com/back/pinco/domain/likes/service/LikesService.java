@@ -124,7 +124,7 @@ public class LikesService {
 
         return likesRepository.findPinsByUserId(userId)
                 .stream()
-                .filter(pin -> pin.getUser().getId().equals(userId) || pin.getIsPublic())
+                .filter(pin -> pin.getUser().getId().equals(userId) || pin.isPublic())
                 .map(PinsLikedByUserResponse::formEntry)
                 .toList();
     }
