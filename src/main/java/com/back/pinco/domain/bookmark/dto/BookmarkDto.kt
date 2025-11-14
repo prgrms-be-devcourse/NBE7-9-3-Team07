@@ -10,14 +10,11 @@ import java.time.LocalDateTime
  * @param pin 핀 정보
  * @param createdAt 생성일
  */
-
-@JvmRecord
 data class BookmarkDto(
     val id: Long?,
     val pin: PinDto,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime?
 ) {
-    // 생성자 내에서 Java Getter 대신 Kotlin 프로퍼티 접근 사용
     constructor(bookmark: Bookmark) : this(
         bookmark.id,
         PinDto(bookmark.pin),
