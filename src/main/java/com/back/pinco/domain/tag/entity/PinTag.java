@@ -70,4 +70,8 @@ public class PinTag extends BaseEntity {
         this.tag = tag;
         this.deleted = deleted;
     }
+
+    public Tag getTag() {
+        return tag;
+    }
 }

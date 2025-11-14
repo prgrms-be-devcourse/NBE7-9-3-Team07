@@ -112,7 +112,7 @@ public class LikesService {
 
         return likesRepository.findUsersByPinId(pinId)
                 .stream()
-                .map(PinLikedUserResponse::formEntry)
+                .map(user -> PinLikedUserResponse.Companion.fromEntry(user))
                 .toList();
     }
 
@@ -125,7 +125,7 @@ public class LikesService {
         return likesRepository.findPinsByUserId(userId)
                 .stream()
                 .filter(pin -> pin.getUser().getId().equals(userId) || pin.isPublic())
-                .map(PinsLikedByUserResponse::formEntry)
+                .map(pin -> PinsLikedByUserResponse.Companion.fromEntry(pin))
                 .toList();
     }
 
