@@ -1,21 +1,21 @@
-package com.back.pinco.domain.likes.dto;
+package com.back.pinco.domain.likes.dto
 
-import com.back.pinco.domain.user.entity.User;
+import com.back.pinco.domain.user.entity.User
 
 /**
  * 특정 핀을 좋아한 사용자 정보
  * @param id 사용자 ID
  * @param userName 사용자명
  */
-public record PinLikedUserResponse(
-        Long id,
-        String userName
+data class PinLikedUserResponse(
+    val id: Long,
+    val userName: String
 ) {
-    public static PinLikedUserResponse formEntry(User user) {
-        return new PinLikedUserResponse(
-                user.getId(),
-                user.getUserName()
-        );
+    companion object {
+        fun fromEntry(user: User) =
+            PinLikedUserResponse(
+                id = user.id!!,
+                userName = user.userName
+            )
     }
-
 }
