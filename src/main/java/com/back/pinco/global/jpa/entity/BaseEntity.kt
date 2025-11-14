@@ -1,34 +1,34 @@
-package com.back.pinco.global.jpa.entity;
+package com.back.pinco.global.jpa.entity
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.Column
+import jakarta.persistence.EntityListeners
+import jakarta.persistence.MappedSuperclass
+import lombok.Getter
+import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedBy
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.time.LocalDateTime
 
 @MappedSuperclass
-@Getter
-@EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity {
-
+@EntityListeners(AuditingEntityListener::class)
+abstract class BaseEntity {
     @Column(name = "create_at", nullable = false, updatable = false)
     @CreatedDate
-    private LocalDateTime createdAt;
+    var createdAt: LocalDateTime? = null
+        protected set
 
     @Column(name = "create_by")
     @CreatedBy
-    private long createdBy;
+    var createdBy: Long = 0
 
     @Column(name = "modified_at")
     @LastModifiedDate
-    private LocalDateTime modifiedAt;
+    var modifiedAt: LocalDateTime? = null
+        protected set
 
     @Column(name = "modified_by")
     @LastModifiedBy
-    private long modifiedBy;
-
+    var modifiedBy: Long = 0
 }
