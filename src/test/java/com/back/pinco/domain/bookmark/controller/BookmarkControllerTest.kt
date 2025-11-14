@@ -43,7 +43,7 @@ class BookmarkControllerTest {
 
     private fun findPinByContent(content: String): Pin {
         return pinRepository.findAll()
-            .first { p: Pin -> content == p.getContent() }
+            .first { p: Pin -> content == p.content }
     }
 
     @Test
@@ -70,7 +70,7 @@ class BookmarkControllerTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("200"))
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").isNumber())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.pin.id").value(targetPinId.toInt()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.pin.id").value(targetPinId!!.toInt()))
 
         Assertions.assertThat(bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinC)).isPresent
     }
