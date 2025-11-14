@@ -299,11 +299,11 @@ public RsData<List<PinDto>> getRectanglePins(
     @Operation(summary = "핀 북마크 등록 - pinId", description = "핀을 id로 조회하여 북마크에 등록")
     @PostMapping("{pinId}/bookmarks")
     public RsData<BookmarkDto> addBookmark(
-            @RequestBody addBookmarkRequest requestDto
+            @RequestBody AddBookmarkRequest requestDto
     ) {
         User actor = rq.getActor();
 
-        BookmarkDto bookmarkDto = bookmarkService.addBookmark(actor.getId(), requestDto.pinId());
+        BookmarkDto bookmarkDto = bookmarkService.addBookmark(actor.getId(), requestDto.getPinId());
         return new RsData<>(
                 "200",
                 "성공적으로 처리되었습니다.",

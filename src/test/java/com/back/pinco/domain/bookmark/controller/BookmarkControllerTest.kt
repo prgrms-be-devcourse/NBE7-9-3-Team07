@@ -72,7 +72,7 @@ class BookmarkControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").isNumber())
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.pin.id").value(targetPinId!!.toInt()))
 
-        Assertions.assertThat(bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinC)).isPresent
+        Assertions.assertThat(bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinC)).isNotNull
     }
 
     @Test
@@ -195,7 +195,8 @@ class BookmarkControllerTest {
     fun t3_1() {
         val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
         val pinA = findPinByContent("서울 시청 근처 카페 ☕")
-        val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA).orElseThrow()
+        val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA)
+            ?: throw RuntimeException("테스트 설정 실패: 북마크를 찾을 수 없음")
 
         val targetBookmarkId = bookmark1A.id
 
@@ -232,7 +233,8 @@ class BookmarkControllerTest {
         val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
         val user2 = userRepository.findByEmail("user2@example.com").orElseThrow()
         val pinA = findPinByContent("서울 시청 근처 카페 ☕")
-        val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA).orElseThrow()
+        val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA)
+            ?: throw RuntimeException("테스트 설정 실패: 북마크를 찾을 수 없음")
 
         val targetBookmarkId = bookmark1A.id
 
@@ -256,7 +258,7 @@ class BookmarkControllerTest {
 
         // 기존 북마크를 삭제 상태로 만들어 놓기
         val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA)
-            .orElseThrow { RuntimeException("Test setup failed: Bookmark not found") }
+            ?: throw RuntimeException("테스트 설정 실패: 북마크를 찾을 수 없음")
         bookmark1A.setDeleted()
         bookmarkRepository.save(bookmark1A)
 
@@ -298,7 +300,7 @@ class BookmarkControllerTest {
 
         // 기존 북마크를 삭제 상태로 만들어 놓기
         val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA)
-            .orElseThrow { RuntimeException("Test setup failed: Bookmark not found") }
+            ?: throw RuntimeException("테스트 설정 실패: 북마크를 찾을 수 없음")
         bookmark1A.setDeleted()
         bookmarkRepository.save(bookmark1A)
 
