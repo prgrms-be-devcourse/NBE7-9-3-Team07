@@ -262,7 +262,7 @@ public RsData<List<PinDto>> getRectanglePins(
         return new RsData<>(
                 "200",
                 "성공적으로 처리되었습니다",
-                likesService.toggleLikeOn(pinId, reqbody.userId())
+                likesService.toggleLikeOn(pinId, reqbody.getUserId())
         );
 
     }
@@ -277,7 +277,7 @@ public RsData<List<PinDto>> getRectanglePins(
         return new RsData<>(
                 "200",
                 "성공적으로 처리되었습니다",
-                likesService.toggleLikeOff(pinId, reqbody.userId())
+                likesService.toggleLikeOff(pinId, reqbody.getUserId())
         );
     }
 
