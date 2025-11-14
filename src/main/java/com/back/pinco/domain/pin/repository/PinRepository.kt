@@ -110,7 +110,7 @@ interface PinRepository : JpaRepository<Pin, Long> {
                 "AND (p.user_id = :actorId OR p.is_public = true)"), nativeQuery = true
     )
     fun findAccessibleByUserDate(
-        writerId: Long?, actorId: Long,
+        writerId: Long, actorId: Long,
         @Param("year") year: Int,
         @Param("month") month: Int
     ): List<Pin>
