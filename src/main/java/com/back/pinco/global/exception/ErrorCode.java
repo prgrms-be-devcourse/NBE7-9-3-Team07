@@ -38,6 +38,7 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(2013, HttpStatus.UNAUTHORIZED, "Access Token이 유효하지 않습니다."),
     AUTH_REQUIRED(2014, HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
     TOKEN_EXPIRED(2015, HttpStatus.UNAUTHORIZED, "Access Token이 만료되었습니다."),
+    ACCESS_DENIED(2016, HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
     // Tag 도메인_3000번대
     TAG_NOT_FOUND(3001, HttpStatus.NOT_FOUND, "존재하지 않는 태그입니다."),
