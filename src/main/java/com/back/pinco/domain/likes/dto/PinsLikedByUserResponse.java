@@ -45,7 +45,7 @@ public record PinsLikedByUserResponse(
                         .map(tag -> new TagDto(tag.getId(), tag.getKeyword(), tag.getCreatedAt()))
                         .collect(Collectors.toList()),
                 pin.getLikeCount(),
-                pin.getIsPublic(),
+                pin.isPublic(),
                 pin.getCreatedAt(),
                 pin.getModifiedAt()
         );
