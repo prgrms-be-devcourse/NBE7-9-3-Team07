@@ -1,6 +1,6 @@
 package com.back.pinco.domain.pin.entity
 
-import com.back.pinco.domain.pin.dto.UpdatePinContentRequest
+import com.back.pinco.domain.pin.dto.PinUpdateRequest
 import com.back.pinco.domain.tag.entity.PinTag
 import com.back.pinco.domain.user.entity.User
 import com.back.pinco.global.geometry.GeometryUtil
@@ -68,7 +68,7 @@ class Pin(
         isPublic = !isPublic
     }
 
-    fun update(updatePinContentRequest: UpdatePinContentRequest) {
+    fun update(updatePinContentRequest: PinUpdateRequest) {
         content = updatePinContentRequest.content
         //추가로 수정 할 수 있는 필드가 있다면 여기 추가
     }

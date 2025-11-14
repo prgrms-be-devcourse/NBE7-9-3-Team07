@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
-import java.util.*
 interface PinRepository : JpaRepository<Pin, Long> {
     @Query(
         value = "SELECT * FROM pins p WHERE ST_DWithin(p.point, ST_SetSRID(ST_MakePoint(:longitude, :latitude), "
@@ -145,7 +144,7 @@ interface PinRepository : JpaRepository<Pin, Long> {
       AND (p.user.id = :userId OR p.isPublic = true)
 """
     )
-    fun findAccessiblePinById(@Param("id") id: Long, @Param("userId") userId: Long): Optional<Pin>
+    fun findAccessiblePinById(@Param("id") id: Long, @Param("userId") userId: Long): Pin?
 
     @Query(
         """
@@ -155,7 +154,7 @@ interface PinRepository : JpaRepository<Pin, Long> {
       AND p.isPublic = true
 """
     )
-    fun findPublicPinById(@Param("id") id: Long): Optional<Pin>
+    fun findPublicPinById(@Param("id") id: Long): Pin?
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(

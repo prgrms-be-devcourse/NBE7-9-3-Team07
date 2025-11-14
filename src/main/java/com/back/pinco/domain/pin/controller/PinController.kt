@@ -7,13 +7,12 @@ import com.back.pinco.domain.likes.dto.PinLikedUserResponse
 import com.back.pinco.domain.likes.dto.PinLikesRequest
 import com.back.pinco.domain.likes.dto.PinLikesResponse
 import com.back.pinco.domain.likes.service.LikesService
+import com.back.pinco.domain.pin.dto.PinCreateRequest
 import com.back.pinco.domain.pin.dto.PinDto
-import com.back.pinco.domain.pin.dto.PinRequest
+import com.back.pinco.domain.pin.dto.PinUpdateRequest
 import com.back.pinco.domain.pin.service.PinService
 import com.back.pinco.domain.user.entity.User
 import com.back.pinco.domain.user.service.UserService
-import com.back.pinco.global.exception.ErrorCode
-import com.back.pinco.global.exception.ServiceException
 import com.back.pinco.global.rq.Rq
 import com.back.pinco.global.rsData.RsData
 import io.swagger.v3.oas.annotations.Operation
@@ -44,9 +43,11 @@ class PinController(
     @Operation(summary = "핀 생성", description = "사용자의 위치와 설명을 받아 핀을 생성")
     @PostMapping
     fun createPin(
-        @RequestBody @Valid
-        pinReqbody: PinRequest
+        @RequestBody
+        @Valid
+        pinReqbody: PinCreateRequest
     ): RsData<PinDto> {
+
         val pin = pinService.write(rq.actor, pinReqbody)
         return RsData(
             "200",
@@ -210,7 +211,7 @@ class PinController(
 
         @RequestBody
         @Valid
-        putPinReqbody: PinRequest
+        putPinReqbody: PinUpdateRequest
 
     ): RsData<PinDto> {
         val pin = pinService.update(rq.actor, pinId, putPinReqbody)
@@ -317,9 +318,7 @@ class PinController(
         @RequestBody requestDto: addBookmarkRequest
     ): RsData<BookmarkDto> {
 
-        //TODO : User 엔티티 변경 후 .getId() -> .id 로 변경
-        val actor : User=rq.actor ?: throw ServiceException(ErrorCode.BOOKMARK_INVALID_USER_INPUT)
-        val bookmarkDto = bookmarkService.addBookmark(actor.getId(), requestDto.pinId)
+        val bookmarkDto = bookmarkService.addBookmark(rq.actor?.id, requestDto.pinId)
 
         return RsData(
             "200",

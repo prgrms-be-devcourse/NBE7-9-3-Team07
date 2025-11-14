@@ -2,7 +2,7 @@ package com.back.pinco.global.initData;
 
 import com.back.pinco.domain.bookmark.service.BookmarkService;
 import com.back.pinco.domain.likes.service.LikesService;
-import com.back.pinco.domain.pin.dto.PinRequest;
+import com.back.pinco.domain.pin.dto.PinCreateRequest;
 import com.back.pinco.domain.pin.entity.Pin;
 import com.back.pinco.domain.pin.service.PinService;
 import com.back.pinco.domain.tag.entity.PinTag;
@@ -56,18 +56,18 @@ public class InitData {
         User user3 = userService.createUser("no@example.com", "12345678", "노미경");
 
         // ✅ 시청 기준 반경 1km 이내 임의 좌표
-        Pin pinA = pinService.write(user1, new PinRequest(baseLat + 0.0012, baseLng + 0.0015, "서울 시청 근처 카페 ☕"));
-        Pin pinB = pinService.write(user1, new PinRequest(baseLat - 0.0008, baseLng + 0.0010, "덕수궁 돌담길 산책 중 🌳"));
-        Pin pinC = pinService.write(user1, new PinRequest(baseLat + 0.0006, baseLng - 0.0013, "청계천 산책로 발견 👣"));
-        Pin pinD = pinService.write(user2, new PinRequest(baseLat - 0.0005, baseLng - 0.0010, "광화문에서 커피 한 잔 ☕"));
-        Pin pinE = pinService.write(user2, new PinRequest(baseLat + 0.0003, baseLng + 0.0002, "서울시청 옆 공원 벤치 휴식 🍃"));
+        Pin pinA = pinService.write(user1, new PinCreateRequest(baseLat + 0.0012, baseLng + 0.0015, "서울 시청 근처 카페 ☕"));
+        Pin pinB = pinService.write(user1, new PinCreateRequest(baseLat - 0.0008, baseLng + 0.0010, "덕수궁 돌담길 산책 중 🌳"));
+        Pin pinC = pinService.write(user1, new PinCreateRequest(baseLat + 0.0006, baseLng - 0.0013, "청계천 산책로 발견 👣"));
+        Pin pinD = pinService.write(user2, new PinCreateRequest(baseLat - 0.0005, baseLng - 0.0010, "광화문에서 커피 한 잔 ☕"));
+        Pin pinE = pinService.write(user2, new PinCreateRequest(baseLat + 0.0003, baseLng + 0.0002, "서울시청 옆 공원 벤치 휴식 🍃"));
 
-        Pin pin6 = pinService.write(user3, new PinRequest(37.56652851254232, 126.99170316409894, "김밥 맛집"));
-        Pin pin7 = pinService.write(user3, new PinRequest(37.56552838426607, 127.00861365307968, "환승 지옥"));
-        Pin pin8 = pinService.write(user3, new PinRequest(37.548877786806514, 126.98935132168111, "1차 방문"));
-        Pin pin9 = pinService.write(user3, new PinRequest(37.548778723722855, 126.9898832031673, "2차 방문"));
-        Pin pin10 = pinService.write(user3, new PinRequest(37.54874263496653, 126.9893287082637, "3차 방문"));
-        Pin pin11 = pinService.write(user3, new PinRequest(37.57759977323471, 126.97689730646299, "경복궁"));
+        Pin pin6 = pinService.write(user3, new PinCreateRequest(37.56652851254232, 126.99170316409894, "김밥 맛집"));
+        Pin pin7 = pinService.write(user3, new PinCreateRequest(37.56552838426607, 127.00861365307968, "환승 지옥"));
+        Pin pin8 = pinService.write(user3, new PinCreateRequest(37.548877786806514, 126.98935132168111, "1차 방문"));
+        Pin pin9 = pinService.write(user3, new PinCreateRequest(37.548778723722855, 126.9898832031673, "2차 방문"));
+        Pin pin10 = pinService.write(user3, new PinCreateRequest(37.54874263496653, 126.9893287082637, "3차 방문"));
+        Pin pin11 = pinService.write(user3, new PinCreateRequest(37.57759977323471, 126.97689730646299, "경복궁"));
 
 
         // ✅ 샘플 북마크 생성 (user1이 pinA, pinD 북마크 / user2가 pinB 북마크)
@@ -146,17 +146,17 @@ public class InitData {
         PinTag pt19 = pinTagService.createPinTag(pin11, t6); // 산책로
 
         // user1의 하루 일상 트래킹
-        Pin morning1 = pinService.write(user1, new PinRequest(37.497942, 127.027621, "☀️ 출근 시작 - 오늘도 화이팅!"));
-        Pin morning2 = pinService.write(user1, new PinRequest(37.566826, 126.978388, "🚇 광화문역 환승 - 사람 진짜 많다"));
-        Pin morning3 = pinService.write(user1, new PinRequest(37.570196, 126.976849, "🏢 회사 도착 - 커피부터"));
-        Pin morning4 = pinService.write(user1, new PinRequest(37.570180, 126.976920, "💼 오전 회의 중 - 프로젝트 진행 상황 공유"));
-        Pin lunch = pinService.write(user1, new PinRequest(37.569500, 126.977500, "🍜 점심은 칼국수 맛집 - 존맛탱"));
-        Pin afternoon1 = pinService.write(user1, new PinRequest(37.571234, 126.975678, "☕ 카페에서 작업 중 - 집중 모드"));
-        Pin afternoon2 = pinService.write(user1, new PinRequest(37.570500, 126.976234, "🍰 디저트 카페 발견 - 케이크가 예술"));
-        Pin evening1 = pinService.write(user1, new PinRequest(37.570196, 126.976849, "🌆 퇴근 완료 - 오늘 하루도 수고했어"));
-        Pin evening2 = pinService.write(user1, new PinRequest(37.580450, 126.977041, "🍺 친구들과 저녁 - 삼겹살 파티"));
-        Pin evening3 = pinService.write(user1, new PinRequest(37.579617, 126.976950, "🌙 청계천 야경 산책 - 분위기 좋다"));
-        Pin night = pinService.write(user1, new PinRequest(37.497942, 127.027621, "🏠 집 도착 - 오늘 하루 완료!"));
+        Pin morning1 = pinService.write(user1, new PinCreateRequest(37.497942, 127.027621, "☀️ 출근 시작 - 오늘도 화이팅!"));
+        Pin morning2 = pinService.write(user1, new PinCreateRequest(37.566826, 126.978388, "🚇 광화문역 환승 - 사람 진짜 많다"));
+        Pin morning3 = pinService.write(user1, new PinCreateRequest(37.570196, 126.976849, "🏢 회사 도착 - 커피부터"));
+        Pin morning4 = pinService.write(user1, new PinCreateRequest(37.570180, 126.976920, "💼 오전 회의 중 - 프로젝트 진행 상황 공유"));
+        Pin lunch = pinService.write(user1, new PinCreateRequest(37.569500, 126.977500, "🍜 점심은 칼국수 맛집 - 존맛탱"));
+        Pin afternoon1 = pinService.write(user1, new PinCreateRequest(37.571234, 126.975678, "☕ 카페에서 작업 중 - 집중 모드"));
+        Pin afternoon2 = pinService.write(user1, new PinCreateRequest(37.570500, 126.976234, "🍰 디저트 카페 발견 - 케이크가 예술"));
+        Pin evening1 = pinService.write(user1, new PinCreateRequest(37.570196, 126.976849, "🌆 퇴근 완료 - 오늘 하루도 수고했어"));
+        Pin evening2 = pinService.write(user1, new PinCreateRequest(37.580450, 126.977041, "🍺 친구들과 저녁 - 삼겹살 파티"));
+        Pin evening3 = pinService.write(user1, new PinCreateRequest(37.579617, 126.976950, "🌙 청계천 야경 산책 - 분위기 좋다"));
+        Pin night = pinService.write(user1, new PinCreateRequest(37.497942, 127.027621, "🏠 집 도착 - 오늘 하루 완료!"));
 
         Tag t10 = tagService.createTag("출근");
         Tag t11 = tagService.createTag("회사");
