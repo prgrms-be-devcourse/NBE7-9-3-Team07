@@ -56,14 +56,6 @@ public class PinTagService {
         deletePinTag(pinTag); // 핀-태그 연결 삭제
     }
 
-    // 태그 복구
-    @Transactional
-    public void restoreTagFromPin(Long pinId, Long tagId) {
-        PinTag pinTag = findPinTagOrThrow(pinId, tagId); // 핀-태그 연결 조회
-        validateDeletedState(pinTag); // 삭제 상태 검증
-        restorePinTag(pinTag); // 핀-태그 연결 복구
-    }
-
     // 여러 태그를 핀에 연결(PinController용)
     @Transactional
     public List<Tag> linkTagsToPin(Long pinId, List<String> tagKeywords) {
@@ -125,13 +117,6 @@ public class PinTagService {
         }
     }
 
-    // 삭제 상태 검증
-    private void validateDeletedState(PinTag pinTag) {
-        if (Boolean.FALSE.equals(pinTag.getDeleted())) {
-            throw new ServiceException(ErrorCode.TAG_ALREADY_LINKED);
-        }
-    }
-
     // 결과 핀 리스트 검증
     private void validateResultPins(List<Pin> pins) {
         if (CollectionUtils.isEmpty(pins)) {
@@ -161,7 +146,7 @@ public class PinTagService {
 
     // 활성 태그 조회
     private List<Tag> findActiveTagsByPin(Long pinId) {
-        return pinTagRepository.findAllByPin_IdAndDeletedFalse(pinId)
+        return pinTagRepository.findAllByPin_Id(pinId)
                 .stream()
                 .map(PinTag::getTag)
                 .toList();
@@ -190,22 +175,16 @@ public class PinTagService {
 
     // 기존 핀-태그 연결 처리
     private void handleExistingPinTag(Long pinId, Tag tag) {
-        var existing = pinTagRepository.findByPin_IdAndTag_Id(pinId, tag.getId());
-        if (existing.isPresent()) {
-            PinTag pinTag = existing.get();
-            if (pinTag.getDeleted()) {
-                pinTag.restore();
-                pinTagRepository.save(pinTag);
-            } else {
-                throw new ServiceException(ErrorCode.TAG_ALREADY_LINKED);
-            }
-        }
+        pinTagRepository.findByPin_IdAndTag_Id(pinId, tag.getId())
+                .ifPresent(pinTag -> {
+                    throw new ServiceException(ErrorCode.TAG_ALREADY_LINKED);
+                });
     }
 
     // 새로운 핀-태그 연결 저장
     private PinTag saveNewPinTag(Pin pin, Tag tag) {
         try {
-            return pinTagRepository.save(new PinTag(pin, tag, false));
+            return pinTagRepository.save(new PinTag(pin, tag));
         } catch (Exception e) {
             throw new ServiceException(ErrorCode.TAG_CREATE_FAILED);
         }
@@ -214,18 +193,9 @@ public class PinTagService {
     // 핀-태그 연결 삭제
     private void deletePinTag(PinTag pinTag) {
         try {
-            pinTag.setDeleted();
+            pinTagRepository.delete(pinTag);
         } catch (Exception e) {
             throw new ServiceException(ErrorCode.PIN_TAG_DELETE_FAILED);
-        }
-    }
-
-    // 핀-태그 연결 복구
-    private void restorePinTag(PinTag pinTag) {
-        try {
-            pinTag.restore();
-        } catch (Exception e) {
-            throw new ServiceException(ErrorCode.PIN_TAG_RESTORE_FAILED);
         }
     }
 
@@ -235,21 +205,10 @@ public class PinTagService {
         for (String keyword : tagKeywords) {
             if (io.micrometer.common.util.StringUtils.isBlank(keyword)) continue;
             Tag tag = findOrCreateTag(keyword);
-            linkOrRestoreTag(pin, tag);
+            pinTagRepository.save(new PinTag(pin, tag));
             linkedTags.add(tag);
         }
         return linkedTags;
-    }
-
-    // 태그 링크 또는 복구
-    private void linkOrRestoreTag(Pin pin, Tag tag) {
-        pinTagRepository.findByPin_IdAndTag_Id(pin.getId(), tag.getId())
-                .ifPresentOrElse(
-                        existing -> {
-                            if (Boolean.TRUE.equals(existing.getDeleted())) existing.restore();
-                        },
-                        () -> pinTagRepository.save(new PinTag(pin, tag, false))
-                );
     }
 
     // 태그별 핀 교집합 계산
