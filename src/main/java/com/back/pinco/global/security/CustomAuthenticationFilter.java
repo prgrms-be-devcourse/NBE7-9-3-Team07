@@ -42,19 +42,25 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         final String uri = req.getRequestURI();
         final String method = req.getMethod();
 
-        // /api/pins 와 /api/pins/** 둘 다 허용
-        if (method.equals("GET") && (uri.equals("/api/pins") || uri.startsWith("/api/pins/"))) {
+        // Preflight 요청은 빠르게 통과
+        if ("OPTIONS".equalsIgnoreCase(method)) {
             chain.doFilter(req, res);
             return;
         }
 
-        // /api/* 가 아니거나 공개 경로(join, login)면 바로 통과
+        // /api/pins 와 /api/pins/** GET은 공개
+        if ("GET".equalsIgnoreCase(method) && (uri.equals("/api/pins") || uri.startsWith("/api/pins/"))) {
+            chain.doFilter(req, res);
+            return;
+        }
+
+        // /api/* 가 아니거나 공개 경로면 통과
         if (!uri.startsWith("/api/") || PERMIT_PATHS.stream().anyMatch(uri::equals)) {
             chain.doFilter(req, res);
             return;
         }
 
-        // 인증 정보 추출 (Authorization: Bearer <apiKey> <accessToken> 지원 + 쿠키 fallback)
+        // 인증 정보 추출 (Authorization: Bearer <apiKey> <accessToken> + 헤더/쿠키 fallback)
         String apiKey = rq.getHeader("X-API-Key", "");
         String accessToken = "";
 
@@ -69,13 +75,15 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             if (bits.length == 3) accessToken = bits[2];
         }
 
+        if (apiKey.isBlank()) apiKey = rq.getHeader("apiKey", ""); // 혹시 다른 클라이언트 호환
         if (apiKey.isBlank()) apiKey = rq.getCookieValue("apiKey", "");
+        if (accessToken.isBlank()) accessToken = rq.getHeader("accessToken", "");
         if (accessToken.isBlank()) accessToken = rq.getCookieValue("accessToken", "");
 
         boolean hasApiKey = !apiKey.isBlank();
         boolean hasAccess = !accessToken.isBlank();
 
-        // 인증 수단 전혀 없으면 익명 통과(정책에 맞게 유지)
+        // 인증 수단 전혀 없으면 익명 통과(정책 유지)
         if (!hasApiKey && !hasAccess) {
             chain.doFilter(req, res);
             return;
@@ -87,7 +95,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
         if (hasAccess && tokenProvider.isValid(accessToken)) {
             Map<String, Object> payload = tokenProvider.payloadOrNull(accessToken);
-            if (payload != null) {
+            if (payload != null && payload.get("id") instanceof Number) {
                 long id = ((Number) payload.get("id")).longValue();
                 Optional<User> u = userService.findByIdOptional(id);
                 if (u.isPresent()) {
@@ -107,7 +115,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-
+        // 결국 유저를 못 찾으면 401
         if (user == null) {
             write401(res, ErrorCode.INVALID_ACCESS_TOKEN);
             return;
@@ -134,11 +142,8 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         res.setStatus(ec.getStatus().value());
         res.setContentType("application/json;charset=UTF-8");
         res.getWriter().write("""
-        {"errorCode":"%s","msg":"%s"}
-    """.formatted(ec.getCode(), ec.getMessage()));
+                {"errorCode":"%s","msg":"%s"}
+                """.formatted(ec.getCode(), ec.getMessage()));
         res.getWriter().flush();
     }
 }
-
-
-
