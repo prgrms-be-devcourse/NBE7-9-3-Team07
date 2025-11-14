@@ -1,22 +1,22 @@
-package com.back.pinco.domain.pin.dto;
+package com.back.pinco.domain.pin.dto
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 
-public record CreatePinRequest(
-        @NotNull
-        @Min(-90)
-        @Max(90)
-        Double latitude,
+data class PinRequest(
+    @field:NotNull
+    @field:Min(-90)
+    @field:Max(90)
+    val latitude: Double,
 
-        @NotNull
-        @Min(-180)
-        @Max(180)
-        Double longitude,
-        @NotBlank
-        String content
+    @field:NotNull
+    @field:Min(-180)
+    @field:Max(180)
+    val longitude: Double,
 
-){
-}
+    @field:NotBlank
+    val content: String
+
+) 

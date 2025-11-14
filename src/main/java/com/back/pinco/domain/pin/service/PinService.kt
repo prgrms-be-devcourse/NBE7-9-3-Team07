@@ -1,166 +1,147 @@
-package com.back.pinco.domain.pin.service;
+package com.back.pinco.domain.pin.service
 
-import com.back.pinco.domain.likes.repository.LikesRepository;
-import com.back.pinco.domain.pin.dto.CreatePinRequest;
-import com.back.pinco.domain.pin.dto.UpdatePinContentRequest;
-import com.back.pinco.domain.pin.entity.Pin;
-import com.back.pinco.domain.pin.repository.PinRepository;
-import com.back.pinco.domain.user.entity.User;
-import com.back.pinco.global.exception.ErrorCode;
-import com.back.pinco.global.exception.ServiceException;
-import com.back.pinco.global.geometry.GeometryUtil;
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
-import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.List;
-
+import com.back.pinco.domain.pin.dto.PinRequest
+import com.back.pinco.domain.pin.entity.Pin
+import com.back.pinco.domain.pin.repository.PinRepository
+import com.back.pinco.domain.user.entity.User
+import com.back.pinco.global.exception.ErrorCode
+import com.back.pinco.global.exception.ServiceException
+import com.back.pinco.global.geometry.GeometryUtil.createPoint
+import jakarta.transaction.Transactional
+import org.springframework.stereotype.Service
+import java.util.function.Supplier
 
 @Service
-@RequiredArgsConstructor
-public class PinService {
-    private final PinRepository pinRepository;
+class PinService (private val pinRepository: PinRepository){
 
 
-    public long count() {
-        return pinRepository.count();
+    fun count(): Long {
+        return pinRepository.count()
     }
 
-
-    public Pin write(User actor, CreatePinRequest pinReqbody) {
-        if(actor==null) throw new ServiceException(ErrorCode.PIN_NO_PERMISSION);
-        Point point = GeometryUtil.createPoint(pinReqbody.longitude(), pinReqbody.latitude());
+    fun write(actor: User?, pinReqbody: PinRequest): Pin {
+        if(actor == null) throw ServiceException(ErrorCode.PIN_NO_PERMISSION)
+        val point = createPoint(pinReqbody.longitude, pinReqbody.latitude)
         try {
-            Pin pin = new Pin(point, actor, pinReqbody.content());
-            return pinRepository.save(pin);
-        }catch(Exception e){
-            throw new ServiceException(ErrorCode.PIN_CREATE_FAILED);
+            val pin = Pin(point, actor, pinReqbody.content)
+            return pinRepository.save<Pin>(pin)
+        } catch (_: Exception) {
+            throw ServiceException(ErrorCode.PIN_CREATE_FAILED)
         }
     }
 
-    public Pin findById(long id, User actor) {
-        if(actor==null){
-            return pinRepository.findPublicPinById(id)
-                    .orElseThrow(() -> new ServiceException(ErrorCode.PIN_NOT_FOUND));
+    fun findById(id: Long, actor: User?): Pin {
+        return if (actor == null) {
+             pinRepository.findPublicPinById(id)
+                .orElseThrow(Supplier { ServiceException(ErrorCode.PIN_NOT_FOUND) })
+        } else {
+            pinRepository.findAccessiblePinById(id, actor.id)
+                .orElseThrow(Supplier { ServiceException(ErrorCode.PIN_NOT_FOUND) })
         }
-
-        return pinRepository.findAccessiblePinById(id, actor.getId())
-                .orElseThrow(() -> new ServiceException(ErrorCode.PIN_NOT_FOUND));
     }
 
-    public Boolean checkId(long id) {
-        return pinRepository.findById(id).isPresent();
+    fun checkId(id: Long): Boolean = pinRepository.findById(id).isPresent
+
+
+    fun findAll(actor: User?): List<Pin> {
+        return if (actor == null) {
+            pinRepository.findAllPublicPins()
+        } else {
+            pinRepository.findAllAccessiblePins(actor.id)
+        }
     }
 
-    public List<Pin> findAll(User actor) {
-        List<Pin> pins;
-        if(actor==null){
-            pins= pinRepository.findAllPublicPins();
-        }else {
-            pins = pinRepository.findAllAccessiblePins(actor.getId());
+    fun findNearPins(latitude: Double, longitude: Double, radius: Double, actor: User?):List<Pin> {
+        return if (actor == null) {
+            pinRepository.findPublicPinsWithinRadius(latitude, longitude, radius)
+        } else {
+            pinRepository.findPinsWithinRadius(latitude, longitude, radius, actor.id)
         }
-
-        return pins;
     }
 
-    public List<Pin> findNearPins(double latitude,double longitude, double radius, User actor) {
-        List<Pin> pins;
-        if(actor==null){
-            pins=  pinRepository.findPublicPinsWithinRadius(latitude,longitude,radius);
-        }else {
-            pins =  pinRepository.findPinsWithinRadius(latitude,longitude,radius, actor.getId());
+    fun findScreenPins(
+        latMax: Double,
+        lonMax: Double,
+        latMin: Double,
+        lonMin: Double,
+        actor: User?
+    ): List<Pin> {
+
+        return if (actor == null) {
+            pinRepository.findPublicScreenPins(latMax, lonMax, latMin, lonMin)
+        } else {
+            pinRepository.findScreenPins(latMax, lonMax, latMin, lonMin, actor.id)
         }
-        return pins;
     }
 
-    public List<Pin> findScreenPins(double latMax, double lonMax,double latMin,double lonMin, User actor) {
-        List<Pin> pins;
-        if(actor==null){
-            pins=  pinRepository.findPublicScreenPins(latMax,lonMax,latMin,lonMin);
-        }else {
-            pins =  pinRepository.findScreenPins(latMax,lonMax,latMin,lonMin, actor.getId());
+    fun findByUserId(actor: User?, writer: User): List<Pin> {
+        return if (actor == null) {
+           pinRepository.findPublicByUser(writer.id)
+        } else {
+            pinRepository.findAccessibleByUser(writer.id, actor.id)
         }
-        return pins;
     }
 
-    public List<Pin> findByUserId(User actor, User writer) {
-        List<Pin> pins;
-        if(actor==null){
-            pins= pinRepository.findPublicByUser(writer.getId());
-        }else {
-            pins = pinRepository.findAccessibleByUser(writer.getId(), actor.getId());
+    fun findByUserIdDate(actor: User?, writer: User, year: Double, month: Double): List<Pin> {
+        return if (actor == null) {
+            pinRepository.findPublicByUserDate(writer.id, year.toInt(), month.toInt())
+        } else {
+            pinRepository.findAccessibleByUserDate(writer.id, actor.id, year.toInt(), month.toInt())
         }
-
-        return pins;
-    }
-
-    public List<Pin> findByUserIdDate(User actor, User writer, double year,double month) {
-        System.out.println(year+" "+month+"-------------");
-        List<Pin> pins;
-        if(actor==null){
-            pins= pinRepository.findPublicByUserDate(writer.getId(), (int) year, (int) month);
-        }else {
-            pins = pinRepository.findAccessibleByUserDate(writer.getId(), actor.getId(), (int) year, (int) month);
-        }
-
-        return pins;
     }
 
     @Transactional
-    public Pin update(User actor, Long pinId, UpdatePinContentRequest updatePinContentRequest) {
-        Pin pin = pinRepository.findById(pinId).orElseThrow(()->new ServiceException(ErrorCode.PIN_NOT_FOUND));
-        if(pin.getUser().getId().equals(actor.getId())){
+    fun update(actor: User?, pinId: Long, updatePinContentRequest: PinRequest): Pin {
+        val pin = pinRepository.findById(pinId)?: throw ServiceException(ErrorCode.PIN_NOT_FOUND)
+
+        if (pin.user.id == actor?.id) {
             try {
-                pin.update(updatePinContentRequest);
-            }catch(Exception e){
-                throw new ServiceException(ErrorCode.PIN_UPDATE_FAILED);
+                pin.update(updatePinContentRequest)
+            } catch (_: Exception) {
+                throw ServiceException(ErrorCode.PIN_UPDATE_FAILED)
             }
-        }else{
-            throw new ServiceException(ErrorCode.PIN_NO_PERMISSION);
+        } else {
+            throw ServiceException(ErrorCode.PIN_NO_PERMISSION)
         }
 
 
-        return pin;
+        return pin
     }
 
     @Transactional
-    public Pin changePublic(User actor, Long pinId) {
-        Pin pin = pinRepository.findById(pinId).orElseThrow(()->new ServiceException(ErrorCode.PIN_NOT_FOUND));
-        if(pin.getUser().getId().equals(actor.getId())){
+    fun changePublic(actor: User?, pinId: Long): Pin {
+        val pin = pinRepository.findById(pinId)
+            .orElseThrow(ServiceException(ErrorCode.PIN_NOT_FOUND) )
+        if (pin.user.id == actor?.id) {
             try {
-                pin.togglePublic();
-            }catch(Exception e){
-                throw new ServiceException(ErrorCode.PIN_UPDATE_FAILED);
+                pin.togglePublic()
+            } catch (_: Exception) {
+                throw ServiceException(ErrorCode.PIN_UPDATE_FAILED)
             }
-        }else{
-            throw new ServiceException(ErrorCode.PIN_NO_PERMISSION);
+        } else {
+            throw ServiceException(ErrorCode.PIN_NO_PERMISSION)
         }
 
-        return pin;
+        return pin
     }
 
-    public void deleteById(Long pinId, User actor) {
-        Pin pin = pinRepository.findById(pinId).orElseThrow(()->new ServiceException(ErrorCode.PIN_NOT_FOUND));
-        if(pin.getUser().getId().equals(actor.getId())){
+    fun deleteById(pinId: Long, actor: User?) {
+        val pin = pinRepository.findById(pinId)
+            .orElseThrow(ServiceException(ErrorCode.PIN_NOT_FOUND) )
+        if (pin.user.id == actor?.id) {
             try {
-                pin.setDeleted();
-            }catch(Exception e){
-                throw new ServiceException(ErrorCode.PIN_DELETE_FAILED);
+                pin.setDeleted()
+            } catch (_: Exception) {
+                throw ServiceException(ErrorCode.PIN_DELETE_FAILED)
             }
-        }else{
-            throw new ServiceException(ErrorCode.PIN_NO_PERMISSION);
+        } else {
+            throw ServiceException(ErrorCode.PIN_NO_PERMISSION)
         }
 
-        pinRepository.save(pin);
+        pinRepository.save(pin)
     }
 
     @Transactional
-    public int updateDeleteByUser(Long userId) {
-        return pinRepository.updatePinsToDeletedByUserId(userId);
-    }
+    fun updateDeleteByUser(userId: Long): Int = pinRepository.updatePinsToDeletedByUserId(userId)
+
 }
