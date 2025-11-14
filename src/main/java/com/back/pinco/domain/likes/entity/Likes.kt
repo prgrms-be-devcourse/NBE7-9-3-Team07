@@ -38,4 +38,5 @@ class Likes(
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "like_id_gen")
     @Column(name = "like_id")
     var id: Long? = null
+        protected set
 }

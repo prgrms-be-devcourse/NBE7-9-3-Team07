@@ -7,14 +7,10 @@ import com.back.pinco.global.geometry.GeometryUtil
 import com.back.pinco.global.jpa.entity.BaseEntity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
-import lombok.Getter
-import lombok.NoArgsConstructor
 import org.locationtech.jts.geom.Point
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 @Entity
-@NoArgsConstructor
-@Getter
 @Table(
     name = "pins",
     indexes = [Index(name = "idx_pin_point", columnList = "point")]
@@ -26,7 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
     initialValue = 1, allocationSize = 50
 )
 class Pin(
-    @Column(name = "point", nullable = false, columnDefinition = "geography(Point, " + GeometryUtil.SRID + ")")
+    @Column(name = "point", nullable = false, columnDefinition = "geography(Point, ${GeometryUtil.SRID})")
     val point: Point,
 
     @JoinColumn(name = "user_id", nullable = false)
@@ -44,7 +40,7 @@ class Pin(
 
     @OneToMany(mappedBy = "pin", cascade = [CascadeType.ALL], orphanRemoval = true)
     @JsonIgnore
-    val pinTags: MutableList<PinTag> = ArrayList<PinTag>()
+    val pinTags: MutableList<PinTag> = mutableListOf<PinTag>()
 
     @Column(name = "like_count", nullable = false)
     var likeCount = 0 // 좋아요 수
@@ -64,7 +60,7 @@ class Pin(
 
     //삭제 복구
     fun unSetDeleted() {
-        deleted = true
+        deleted = false
     }
 
     // 공개 여부 변경

@@ -2,15 +2,9 @@ package com.back.pinco.domain.user.entity
 
 import com.back.pinco.global.jpa.entity.BaseEntity
 import jakarta.persistence.*
-import lombok.Getter
-import lombok.NoArgsConstructor
-import lombok.Setter
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 @Entity
-@NoArgsConstructor
-@Getter
-@Setter
 @Table(
     name = "users",
     indexes = [Index(name = "idx_user_email", columnList = "email")]

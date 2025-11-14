@@ -3,7 +3,6 @@ package com.back.pinco.global.jpa.entity
 import jakarta.persistence.Column
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.MappedSuperclass
-import lombok.Getter
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
@@ -32,4 +31,5 @@ abstract class BaseEntity {
     @Column(name = "modified_by")
     @LastModifiedBy
     var modifiedBy: Long? = null
+        protected set
 }

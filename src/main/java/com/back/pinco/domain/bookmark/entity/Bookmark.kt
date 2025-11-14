@@ -4,8 +4,6 @@ import com.back.pinco.domain.pin.entity.Pin
 import com.back.pinco.domain.user.entity.User
 import com.back.pinco.global.jpa.entity.BaseEntity
 import jakarta.persistence.*
-import lombok.Getter
-import lombok.NoArgsConstructor
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 @Entity
