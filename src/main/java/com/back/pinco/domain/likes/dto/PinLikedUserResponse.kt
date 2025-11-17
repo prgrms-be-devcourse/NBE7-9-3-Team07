@@ -12,7 +12,7 @@ data class PinLikedUserResponse(
     val userName: String
 ) {
     companion object {
-        fun fromEntry(user: User) =
+        fun fromEntity(user: User) =
             PinLikedUserResponse(
                 id = user.id!!,
                 userName = user.userName
