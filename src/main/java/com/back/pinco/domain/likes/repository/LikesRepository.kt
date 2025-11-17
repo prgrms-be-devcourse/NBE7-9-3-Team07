@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
-@Repository
 interface LikesRepository : JpaRepository<Likes, Long> {
     /** 특정 핀에 대해 특정 사용자의 좋아요 엔티티 조회  */
     @Query("SELECT l FROM Likes l WHERE l.pin.id = :pinId AND l.user.id = :userId")
@@ -28,6 +27,7 @@ interface LikesRepository : JpaRepository<Likes, Long> {
     fun findUsersByPinId(@Param("pinId") pinId: Long): List<User>
 
     /** 특정 사용자가 좋아요한 모든 핀 엔티티 조회  */
+    // TODO: N + 1 해결
     @Query("SELECT DISTINCT l.pin FROM Likes l WHERE l.user.id = :userId")
     fun findPinsByUserId(@Param("userId") userId: Long): List<Pin>
 
