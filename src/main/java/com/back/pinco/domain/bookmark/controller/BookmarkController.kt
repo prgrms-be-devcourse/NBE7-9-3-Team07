@@ -18,7 +18,7 @@ class BookmarkController(
 
     @GetMapping
     @Operation(summary = "나의 북마크 목록 조회", description = "사용자가 저장한 핀들의 목록을 조회")
-    fun getMyBookmarks(): RsData<List<BookmarkDto?>> {
+    fun getMyBookmarks(): RsData<List<BookmarkDto>> {
         val userId = rq.getActorIdOrThrow()
         val bookmarkDtos = bookmarkService.getMyBookmarks(userId)
 
@@ -37,21 +37,9 @@ class BookmarkController(
 
         return RsData(
             "200",
-            "성공적으로 처리되었습니다.",
-            Unit
+            "성공적으로 처리되었습니다."
         )
     }
 
-    @Operation(summary = "북마크 복원", description = "소프트 삭제된 북마크를 복원")
-    @PatchMapping("/{bookmarkId}")
-    fun restoreBookmark(@PathVariable bookmarkId: Long): RsData<Unit> {
-        val userId = rq.getActorIdOrThrow()
-        bookmarkService.restoreBookmark(userId, bookmarkId)
 
-        return RsData(
-            "200",
-            "성공적으로 처리되었습니다.",
-            Unit
-        )
-    }
 }

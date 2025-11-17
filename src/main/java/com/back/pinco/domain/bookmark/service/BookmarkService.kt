@@ -4,12 +4,12 @@ import com.back.pinco.domain.bookmark.dto.BookmarkDto
 import com.back.pinco.domain.bookmark.entity.Bookmark
 import com.back.pinco.domain.bookmark.repository.BookmarkRepository
 import com.back.pinco.domain.pin.service.PinService
-import com.back.pinco.domain.user.entity.User
 import com.back.pinco.domain.user.repository.UserRepository
 import com.back.pinco.global.exception.ErrorCode
 import com.back.pinco.global.exception.ServiceException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+
 
 @Service
 @Transactional(readOnly = true)
@@ -60,7 +60,7 @@ class BookmarkService(
      * @param userId 사용자 ID
      * @return 북마크 DTO 목록
      */
-    fun getMyBookmarks(userId: Long): List<BookmarkDto?> {
+    fun getMyBookmarks(userId: Long): List<BookmarkDto> {
         val user = userRepository.findById(userId)
             .orElseThrow { ServiceException(ErrorCode.BOOKMARK_INVALID_USER_INPUT) }
 
@@ -71,7 +71,7 @@ class BookmarkService(
     }
 
     /**
-     * 북마크 삭제 (소프트 삭제)
+     * 북마크 삭제 (Hard Delete)
      *
      * @param userId 사용자 ID
      * @param bookmarkId 북마크 ID
@@ -86,30 +86,13 @@ class BookmarkService(
             throw ServiceException(ErrorCode.BOOKMARK_NOT_FOUND)
         }
 
-        bookmark.setDeleted()
-        bookmarkRepository.save(bookmark)
-    }
-
-    /**
-     * 북마크 복원
-     *
-     * @param userId 사용자 ID
-     * @param bookmarkId 북마크 ID
-     */
-    @Transactional
-    fun restoreBookmark(userId: Long, bookmarkId: Long) {
-        val user = userRepository.findById(userId)
-            .orElseThrow { ServiceException(ErrorCode.BOOKMARK_INVALID_USER_INPUT) }
-
-        val bookmark = bookmarkRepository.findById(bookmarkId)
-            .orElseThrow { ServiceException(ErrorCode.BOOKMARK_NOT_FOUND) }
-
-        // 소유자가 아니면 찾을 수 없음으로 처리
-        if (bookmark.user.id != user.id) {
-            throw ServiceException(ErrorCode.BOOKMARK_NOT_FOUND)
+        try {
+            bookmarkRepository.delete(bookmark)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorCode.BOOKMARK_DELETE_FAILED)
         }
 
-        bookmark.restore()
         bookmarkRepository.save(bookmark)
     }
+
 }
