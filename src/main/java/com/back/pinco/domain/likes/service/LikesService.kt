@@ -1,153 +1,140 @@
-package com.back.pinco.domain.likes.service;
+package com.back.pinco.domain.likes.service
 
-import com.back.pinco.domain.likes.dto.PinLikedUserResponse;
-import com.back.pinco.domain.likes.dto.PinLikesResponse;
-import com.back.pinco.domain.likes.dto.PinsLikedByUserResponse;
-import com.back.pinco.domain.likes.entity.Likes;
-import com.back.pinco.domain.likes.repository.LikesRepository;
-import com.back.pinco.domain.pin.entity.Pin;
-import com.back.pinco.domain.pin.repository.PinRepository;
-import com.back.pinco.domain.user.entity.User;
-import com.back.pinco.domain.user.repository.UserRepository;
-import com.back.pinco.global.exception.ErrorCode;
-import com.back.pinco.global.exception.ServiceException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import com.back.pinco.domain.likes.dto.PinLikedUserResponse
+import com.back.pinco.domain.likes.dto.PinLikesResponse
+import com.back.pinco.domain.likes.dto.PinsLikedByUserResponse
+import com.back.pinco.domain.likes.entity.Likes
+import com.back.pinco.domain.likes.repository.LikesRepository
+import com.back.pinco.domain.pin.entity.Pin
+import com.back.pinco.domain.pin.repository.PinRepository
+import com.back.pinco.domain.user.entity.User
+import com.back.pinco.domain.user.repository.UserRepository
+import com.back.pinco.global.exception.ErrorCode
+import com.back.pinco.global.exception.ServiceException
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
-public class LikesService {
-
-    private final LikesRepository likesRepository;
-    private final PinRepository pinRepository;
-    private final UserRepository userRepository;
-
-
+class LikesService(
+    private val likesRepository: LikesRepository,
+    private val pinRepository: PinRepository,
+    private val userRepository: UserRepository
+) {
     // 특정 핀에 대한 좋아요 수 조회
     @Transactional(readOnly = true)
-    public int getLikesCount(Long pinId) {
-        return (int) likesRepository.countByPinId(pinId);
-    }
+    fun getLikesCount(pinId: Long): Int =
+        likesRepository.countByPinId(pinId).toInt()
 
 
     // 좋아요 등록
     @Transactional
-    public PinLikesResponse toggleLikeOn(Long pinId, Long userId) {
-        User user = validateUser(userId);
-        Pin pin = validatePin(pinId, userId);
+    fun toggleLikeOn(pinId: Long, userId: Long): PinLikesResponse {
+        val user = validateUser(userId)
+        val pin = validatePin(pinId, userId)
 
-        saveLike(pin, user);
-        int likeCount = refreshPinLikeCount(pinId);
+        saveLike(pin, user)
+        val likeCount = refreshPinLikeCount(pinId)
 
-        return new PinLikesResponse(true, likeCount);
+        return PinLikesResponse(true, likeCount)
     }
 
-    private Likes saveLike(Pin pin, User user) {
-        try {
-            return likesRepository.save(new Likes(pin, user));
-        } catch (Exception e) {
-            throw new ServiceException(ErrorCode.LIKES_CREATE_FAILED);
+    private fun saveLike(pin: Pin, user: User): Likes {
+        return try {
+            likesRepository.save(Likes(pin, user))
+        } catch (e: Exception) {
+            throw ServiceException(ErrorCode.LIKES_CREATE_FAILED)
         }
     }
 
 
     // 좋아요 취소
     @Transactional
-    public PinLikesResponse toggleLikeOff(Long pinId, Long userId) {
-        User user = validateUser(userId);
-        Pin pin = validatePin(pinId, userId);
+    fun toggleLikeOff(pinId: Long, userId: Long): PinLikesResponse {
+        val user = validateUser(userId)
+        val pin = validatePin(pinId, userId)
 
-        deleteLike(pin, user);
-        int likeCount = refreshPinLikeCount(pinId);
+        deleteLike(pin, user)
+        val likeCount = refreshPinLikeCount(pinId)
 
-        return new PinLikesResponse(false, likeCount);
+        return PinLikesResponse(false, likeCount)
     }
 
-    private void deleteLike(Pin pin, User user) {
-        Likes likes = likesRepository.findByPinIdAndUserId(pin.getId(), user.getId());
-        if(likes == null) throw new ServiceException(ErrorCode.LIKES_NOT_FOUND);
+    private fun deleteLike(pin: Pin, user: User) {
+        val likes = likesRepository.findByPinIdAndUserId(pinId =pin.id!!,userId = user.id!!)
+            ?: throw ServiceException(ErrorCode.LIKES_NOT_FOUND)
 
         try {
-            likesRepository.delete(likes);
-        } catch (Exception e) {
-            throw new ServiceException(ErrorCode.LIKES_REVOKE_FAILED);
+            likesRepository.delete(likes)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorCode.LIKES_REVOKE_FAILED)
         }
     }
 
 
-    private Pin validatePin(Long pinId, Long userId) {
-        Pin pin = pinRepository.findAccessiblePinById(pinId, userId);
-        if(pin ==null ) throw new ServiceException(ErrorCode.LIKES_INVALID_PIN_INPUT);
-        return pin;
-    }
+    private fun validatePin(pinId: Long, userId: Long): Pin =
+        pinRepository.findAccessiblePinById(pinId, userId)
+            ?: throw ServiceException(ErrorCode.LIKES_INVALID_PIN_INPUT)
 
-    private User validateUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ServiceException(ErrorCode.LIKES_INVALID_USER_INPUT));
-        return user;
-    }
+
+    private fun validateUser(userId: Long): User =
+        // TODO: UserRepository 전환 이후 수정
+        userRepository.findById(userId).orElseThrow {
+            ServiceException(ErrorCode.LIKES_INVALID_USER_INPUT)
+        }
 
 
     @Transactional
-    public int refreshPinLikeCount(Long pinId) {
-        try {
-            pinRepository.refreshLikeCount(pinId);
-            return getLikesCount(pinId);
-        } catch (Exception e) {
-            throw new ServiceException(ErrorCode.LIKES_UPDATE_PIN_FAILED);
+    fun refreshPinLikeCount(pinId: Long): Int {
+        return try {
+            pinRepository.refreshLikeCount(pinId)
+            getLikesCount(pinId)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorCode.LIKES_UPDATE_PIN_FAILED)
         }
     }
 
 
     // 해당 핀을 좋아요 누른 유저 ID 목록 전달
-    public List<PinLikedUserResponse> getUsersWhoLikedPin(Long pinId) {
+    @Transactional(readOnly = true)
+    fun getUsersWhoLikedPin(pinId: Long): List<PinLikedUserResponse> {
         if (!pinRepository.existsById(pinId)) {
-            throw new ServiceException(ErrorCode.LIKES_INVALID_PIN_INPUT);
+            throw ServiceException(ErrorCode.LIKES_INVALID_PIN_INPUT)
         }
 
         return likesRepository.findUsersByPinId(pinId)
-                .stream()
-                .map(user -> PinLikedUserResponse.Companion.fromEntry(user))
-                .toList();
+            .map { PinLikedUserResponse.fromEntity(it) }
     }
 
     // 특정 사용자가 좋아요 누른 핀 목록 전달
-    public List<PinsLikedByUserResponse> getPinsLikedByUser(Long userId) {
+    @Transactional(readOnly = true)
+    fun getPinsLikedByUser(userId: Long): List<PinsLikedByUserResponse> {
         if (!userRepository.existsById(userId)) {
-            throw new ServiceException(ErrorCode.LIKES_INVALID_USER_INPUT);
+            throw ServiceException(ErrorCode.LIKES_INVALID_USER_INPUT)
         }
 
         return likesRepository.findPinsByUserId(userId)
-                .stream()
-                .filter(pin -> pin.getUser().getId().equals(userId) || pin.isPublic())
-                .map(pin -> PinsLikedByUserResponse.Companion.fromEntry(pin))
-                .toList();
+            .filter { it.user.id == userId || it.isPublic }
+            .map { PinsLikedByUserResponse.fromEntry(it) }
     }
+
 
     // 탈퇴한 사용자의 좋아요 삭제
     @Transactional
-    public void deleteWithdrawnUserLikes(Long userId) {
-        // 핀 조회 : 좋아요 갱신을 위해 -> 비 효율적?
-        List<Pin> likedPinsList = likesRepository.findPinsByUserId(userId);
+    fun deleteWithdrawnUserLikes(userId: Long) {
+        val likedPins: List<Pin> = likesRepository.findPinsByUserId(userId)
 
-        if (likedPinsList.isEmpty()) return;
+        if (likedPins.isEmpty()) return
 
         try {
-            likesRepository.deleteAllByUserId(userId);
+            likesRepository.deleteAllByUserId(userId)
 
-            Long[] pinsId = likedPinsList.stream()
-                    .map(Pin::getId)
-                    .toArray(Long[]::new);
+            val pinsIds = likedPins
+                .mapNotNull { it.id }
+                .toTypedArray()
 
-            pinRepository.refreshLikeCountBatch(pinsId);
-        } catch (Exception e) {
-            throw new ServiceException(ErrorCode.LIKES_UPDATE_PIN_FAILED);
+            pinRepository.refreshLikeCountBatch(pinsIds)
+        } catch (e: Exception) {
+            throw ServiceException(ErrorCode.LIKES_UPDATE_PIN_FAILED)
         }
     }
-
 }
