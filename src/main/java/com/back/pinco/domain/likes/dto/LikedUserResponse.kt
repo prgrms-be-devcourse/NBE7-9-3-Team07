@@ -7,13 +7,13 @@ import com.back.pinco.domain.user.entity.User
  * @param id 사용자 ID
  * @param userName 사용자명
  */
-data class PinLikedUserResponse(
+data class LikedUserResponse(
     val id: Long,
     val userName: String
 ) {
     companion object {
         fun fromEntity(user: User) =
-            PinLikedUserResponse(
+            LikedUserResponse(
                 id = user.id!!,
                 userName = user.userName
             )
