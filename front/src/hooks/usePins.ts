@@ -33,7 +33,7 @@ export function usePins(initialCenter: UsePinsProps, userId?: number | null) {
     const [pins, setPins] = useState<PinDto[]>([]);
     const [allLoadedPins, setAllLoadedPins] = useState<PinDto[]>([]);
     const [loading, setLoading] = useState(false);
-    const [mode, setMode] = useState<Mode>("nearby");
+    const [mode, setMode] = useState<Mode>("screen");
     const [center, setCenter] = useState(initialCenter);
     const [selectedPin, setSelectedPin] = useState<PinDto | null>(null);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -109,13 +109,11 @@ export function usePins(initialCenter: UsePinsProps, userId?: number | null) {
     /* =========================================================
        ✅ 화면상 모든 핀 조회
     ========================================================= */
-    const loadAllPins = async (lat?: number, lng?: number, radius?: number) => {
+    const loadAllPins = async (screenBounds: number[]) => {
         setLoading(true);
         try {
-            const validRadius = radius && radius > 0 ? radius : undefined;
-            const radiusParam = validRadius ? `&radius=${validRadius}` : "";
 
-            const url = `/api/pins?latitude=${lat ?? center.lat}&longitude=${lng ?? center.lng}${radiusParam}`;
+            const url = `/api/pins/screen?latMax=${screenBounds[0]}&lonMax=${screenBounds[1]}&latMin=${screenBounds[2]}&lonMin=${screenBounds[3]}`;
 
             // ✅ fetchApi 사용
             const data:PinDto[] = await fetchApi(url, {
@@ -142,9 +140,6 @@ export function usePins(initialCenter: UsePinsProps, userId?: number | null) {
         }
     };
 
-    useEffect(() => {
-        loadAllPins();
-    }, []);
 
 
     /* =========================================================
