@@ -192,12 +192,6 @@ class UserService(
 
 
     @Transactional(readOnly = true)
-    fun findByIdOptional(id: Long): User =
-        userRepository.findById(id)
-            .orElse(throw ServiceException(ErrorCode.USER_NOT_FOUND))
-
-
-    @Transactional(readOnly = true)
     fun getMyPins() : List<Pin> {
         val user = rq.getActorOrNull()
         return pinService.findByUserId(user, user)

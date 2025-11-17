@@ -85,7 +85,7 @@ class CustomAuthenticationFilter(
             val idAny = payload?.get("id")
             if (idAny is Number) {
                 val id = idAny.toLong()
-                val u = userService.findByIdOptional(id)
+                val u = userService.findById(id)
                 user = u
                 accessValid = true
             }
