@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*
 
 @Tag(name = "User", description = "회원 관리 기능")
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/user")
 class UserController(
     private val userService: UserService,

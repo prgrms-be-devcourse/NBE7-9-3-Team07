@@ -172,14 +172,12 @@ class UserService(
             .orElseThrow { ServiceException(ErrorCode.USER_NOT_FOUND) }
         val nameChanged = nameChanged(currentUser, newUserName)
         val pwdChanged = passwordChanged(currentUser, newPassword)
-        if (nameChanged && pwdChanged) {
-            editAll(currentUser, newUserName, newPassword)
-        } else if (nameChanged) {
-            editName(currentUser, newUserName)
-        } else if (pwdChanged) {
-            editPwd(currentUser, newPassword)
-        } else {
-            throw ServiceException(ErrorCode.NO_FIELDS_TO_UPDATE)
+
+        when {
+            nameChanged && pwdChanged -> editAll(currentUser, newUserName, newPassword)
+            nameChanged -> editName(currentUser, newUserName)
+            pwdChanged -> editPwd(currentUser, newPassword)
+            else -> throw ServiceException(ErrorCode.NO_FIELDS_TO_UPDATE)
         }
     }
 
@@ -194,8 +192,9 @@ class UserService(
 
 
     @Transactional(readOnly = true)
-    fun findByIdOptional(id: Long): Optional<User> =
+    fun findByIdOptional(id: Long): User =
         userRepository.findById(id)
+            .orElse(throw ServiceException(ErrorCode.USER_NOT_FOUND))
 
 
     @Transactional(readOnly = true)
@@ -244,7 +243,7 @@ class UserService(
     @Transactional(readOnly = true)
     fun bookmarkList(): List<PinDto> {
         val bookmarkList = getMyBookmarks().stream()
-            .map(BookmarkDto::pin) // BookmarkDto::getPin 으로 수정 - 이현 님 커밋
+            .map(BookmarkDto::pin)
             .toList()
         return bookmarkList
     }

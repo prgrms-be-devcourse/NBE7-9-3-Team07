@@ -28,16 +28,16 @@ class AuthService(
 
 
     fun genRefreshToken(user: User): String =
-        jwttokenProvider!!.generateRefreshToken(user.id)
+        jwttokenProvider.generateRefreshToken(user.id)
 
 
     fun validateToken(token: String?): Boolean =
         jwttokenProvider.isValid(token)
 
 
-    fun parseToken(token: String?): Map<String, Any>? {
-        return jwttokenProvider.payloadOrNull(token)
-    }
+    fun parseToken(token: String?): Map<String, Any>? =
+        jwttokenProvider.payloadOrNull(token)
+
 
     fun logout(req: HttpServletRequest, res: HttpServletResponse) {
         val accessToken = resolveAccessToken(req)

@@ -86,10 +86,8 @@ class CustomAuthenticationFilter(
             if (idAny is Number) {
                 val id = idAny.toLong()
                 val u = userService.findByIdOptional(id)
-                if (u.isPresent) {
-                    user = u.get()
-                    accessValid = true
-                }
+                user = u
+                accessValid = true
             }
         }
 
