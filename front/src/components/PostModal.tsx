@@ -40,6 +40,7 @@ export default function PostModal({
   const [likeCount, setLikeCount] = useState(pin.likeCount ?? 0);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkId, setBookmarkId] = useState<number | null>(null);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
   const [newTag, setNewTag] = useState("");
   const [editing, setEditing] = useState(false);
   const [content, setContent] = useState(pin.content);
@@ -180,53 +181,64 @@ export default function PostModal({
   };
 
   // 북마크 토글
-    const toggleBookmark = async () => {
-      if (!userId) {
-        alert("로그인 후 이용 가능합니다.");
-        return;
-      }
+  const toggleBookmark = async () => {
+    if (!userId) {
+      alert("로그인 후 이용 가능합니다.");
+      return;
+    }
 
-      try {
-        if (isBookmarked) {
-          // 현재 '북마크됨' → 삭제
-          const id = bookmarkId ?? (await getBookmarkIdForPin(pin.id));
-          if (!id) throw new Error("북마크 ID를 찾을 수 없습니다.");
-          await apiDeleteBookmark(id);
+    if (bookmarkLoading) return; // 중복 클릭 방지
+    setBookmarkLoading(true);
+
+    try {
+      // 현재 북마크가 있으면 하드 삭제 호출
+      if (isBookmarked) {
+        const id = bookmarkId ?? (await getBookmarkIdForPin(pin.id));
+        if (!id) {
+          // 이미 없는 상태라면 UI만 정리
           setIsBookmarked(false);
           setBookmarkId(null);
-          onChanged?.();
           return;
         }
 
-        // 현재 '북마크 안됨' → 생성 시도
-        try {
-          const created = await apiCreateBookmark(pin.id);
-          if (created) {
-            setIsBookmarked(true);
-            setBookmarkId(created.id);
-            onChanged?.();
-          }
-        } catch (err: unknown) {
-          const e = err as { status?: number; message?: string };
-          const msg = e?.message ?? "";
-          // 서버가 "이미 북마크됨"으로 409를 던지면 → 즉시 삭제로 폴백
-          if (e?.status === 409 || /이미 북마크된/.test(msg)) {
-            const id = await getBookmarkIdForPin(pin.id);
-            if (id) {
-              await apiDeleteBookmark(id);
-              setIsBookmarked(false);
-              setBookmarkId(null);
-              onChanged?.();
-              return;
-            }
-          }
-          throw err; // 다른 에러는 그대로 노출
-        }
-      } catch (err) {
-        console.error("북마크 토글 실패:", err);
+        await apiDeleteBookmark(id);
+        setIsBookmarked(false);
+        setBookmarkId(null);
+        onChanged?.();
+        return;
       }
-    };
 
+      // 북마크가 없으면 생성 시도
+      const created = await apiCreateBookmark(pin.id);
+      // fetchApi의 반환 구조 차이를 고려해서 id를 안전하게 추출
+      const createdId = (created as any)?.id ?? (created as any)?.data?.id ?? null;
+
+      if (createdId) {
+        setIsBookmarked(true);
+        setBookmarkId(createdId as number);
+        onChanged?.();
+        return;
+      }
+
+      // 생성 결과에 id가 없으면 현재 북마크 ID를 조회하여 상태를 복구
+      const existingId = await getBookmarkIdForPin(pin.id);
+      if (existingId) {
+        setIsBookmarked(true);
+        setBookmarkId(existingId);
+        onChanged?.();
+        return;
+      }
+
+      throw new Error("북마크 생성 실패");
+    } catch (err: unknown) {
+      // err가 Error일 때 message를 사용자에게 표시
+      console.error("북마크 토글 실패:", err);
+      const msg = (err as any)?.message ?? JSON.stringify(err);
+      alert(msg || "북마크 처리 중 오류가 발생했습니다.");
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
 
   // 공개 토글
   const togglePublic = async () => {
