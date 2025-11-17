@@ -4,6 +4,7 @@ import com.back.pinco.domain.bookmark.dto.BookmarkDto
 import com.back.pinco.domain.bookmark.entity.Bookmark
 import com.back.pinco.domain.bookmark.repository.BookmarkRepository
 import com.back.pinco.domain.pin.service.PinService
+import com.back.pinco.domain.user.entity.User
 import com.back.pinco.domain.user.repository.UserRepository
 import com.back.pinco.global.exception.ErrorCode
 import com.back.pinco.global.exception.ServiceException
@@ -45,8 +46,6 @@ class BookmarkService(
             restore()
             this
         } ?: run {
-            // Elvis Operator (?:): 기존 북마크가 null일 때 (새로운 객체 생성)
-            // Bookmark 엔티티의 주 생성자를 사용 (val user, val pin)
             Bookmark(user, pin)
         }
 
@@ -78,7 +77,7 @@ class BookmarkService(
      * @param bookmarkId 북마크 ID
      */
     @Transactional
-    fun deleteBookmark(userId: Long?, bookmarkId: Long) {
+    fun deleteBookmark(userId: Long, bookmarkId: Long) {
         val bookmark = bookmarkRepository.findById(bookmarkId)
             .orElseThrow { ServiceException(ErrorCode.BOOKMARK_NOT_FOUND) }
 
