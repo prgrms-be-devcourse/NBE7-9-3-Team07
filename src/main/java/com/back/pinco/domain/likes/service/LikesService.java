@@ -69,8 +69,8 @@ public class LikesService {
     }
 
     private void deleteLike(Pin pin, User user) {
-        Likes likes = likesRepository.findByPinIdAndUserId(pin.getId(), user.getId())
-                .orElseThrow(() -> new ServiceException(ErrorCode.LIKES_NOT_FOUND));
+        Likes likes = likesRepository.findByPinIdAndUserId(pin.getId(), user.getId());
+        if(likes == null) throw new ServiceException(ErrorCode.LIKES_NOT_FOUND);
 
         try {
             likesRepository.delete(likes);
