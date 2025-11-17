@@ -1,17 +1,15 @@
-package com.back.pinco.domain.user.dto.UserResBody;
+package com.back.pinco.domain.user.dto.UserResBody
 
-import com.back.pinco.domain.user.dto.UserDto;
+import com.back.pinco.domain.user.dto.UserDto
 
-public record GetInfoResponse(
-        Long id,
-        String email,
-        String userName
-){
-    public GetInfoResponse(UserDto userDto) {
-        this(
-                userDto.id(),
-                userDto.email(),
-                userDto.userName()
-        );
-    }
+data class GetInfoResponse(
+    val id: Long?,
+    val email: String,
+    val userName: String
+) {
+    constructor(userDto: UserDto) : this(
+        userDto.id,
+        userDto.email,
+        userDto.userName
+    )
 }

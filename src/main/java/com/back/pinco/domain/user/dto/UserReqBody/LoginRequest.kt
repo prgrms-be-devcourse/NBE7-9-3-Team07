@@ -1,6 +1,6 @@
-package com.back.pinco.domain.user.dto.UserReqBody;
+package com.back.pinco.domain.user.dto.UserReqBody
 
-public record LoginRequest(
-        String email,
-        String password
-) {}
+data class LoginRequest(
+    val email: String,
+    val password: String
+)

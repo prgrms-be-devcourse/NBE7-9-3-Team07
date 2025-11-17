@@ -1,7 +1,7 @@
-package com.back.pinco.domain.user.dto.UserReqBody;
+package com.back.pinco.domain.user.dto.UserReqBody
 
-public record JoinRequest(
-        String email,
-        String password,
-        String userName
-) {}
+data class JoinRequest(
+    val email: String,
+    val password: String,
+    val userName: String
+)

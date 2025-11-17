@@ -1,26 +1,23 @@
-package com.back.pinco.domain.user.dto;
+package com.back.pinco.domain.user.dto
 
-import com.back.pinco.domain.user.entity.User;
+import com.back.pinco.domain.user.entity.User
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
-
-public record UserDto(
-        Long id,
-        String email,
-        String userName,
-        String password,
-        LocalDateTime createdAt,
-        LocalDateTime modifiedAt
+data class UserDto(
+    val id: Long?,
+    val email: String,
+    val userName: String,
+    val password: String,
+    val createdAt: LocalDateTime?,
+    val modifiedAt: LocalDateTime?
 ) {
-    public UserDto(User user) {
-        this(
-                user.getId(),
-                user.getEmail(),
-                user.getUserName(),
-                user.getPassword(),
-                user.getCreatedAt(),
-                user.getModifiedAt()
-        );
-    }
+    constructor(user: User) : this(
+        user.id,
+        user.email,
+        user.userName,
+        user.password,
+        user.createdAt,
+        user.modifiedAt
+    )
 }
 

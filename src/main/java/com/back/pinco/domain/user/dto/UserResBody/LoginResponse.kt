@@ -1,17 +1,15 @@
-package com.back.pinco.domain.user.dto.UserResBody;
+package com.back.pinco.domain.user.dto.UserResBody
 
-import com.back.pinco.domain.user.dto.UserDto;
+import com.back.pinco.domain.user.dto.UserDto
 
-public record LoginResponse(
-        Long id,
-        String email,
-        String userName
+data class LoginResponse(
+    val id: Long?,
+    val email: String,
+    val userName: String
 ) {
-    public LoginResponse(UserDto userDto) {
-        this(
-                userDto.id(),
-                userDto.email(),
-                userDto.userName()
-        );
-    }
+    constructor(userDto: UserDto) : this(
+        userDto.id,
+        userDto.email,
+        userDto.userName
+    )
 }

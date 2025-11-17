@@ -1,22 +1,19 @@
-package com.back.pinco.domain.user.dto.UserResBody;
+package com.back.pinco.domain.user.dto.UserResBody
 
-import com.back.pinco.domain.user.dto.UserDto;
+import com.back.pinco.domain.user.dto.UserDto
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
-
-public record JoinResponse(
-        Long id,
-        String email,
-        String userName,
-        LocalDateTime createdAt
+data class JoinResponse(
+    val id: Long?,
+    val email: String,
+    val userName: String,
+    val createdAt: LocalDateTime?
 ) {
-    public JoinResponse(UserDto userDto) {
-        this(
-                userDto.id(),
-                userDto.email(),
-                userDto.userName(),
-                userDto.createdAt()
-        );
-    }
+    constructor(userDto: UserDto) : this(
+        userDto.id,
+        userDto.email,
+        userDto.userName,
+        userDto.createdAt
+    )
 }
 
