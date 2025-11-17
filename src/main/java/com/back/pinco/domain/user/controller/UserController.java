@@ -1,6 +1,6 @@
 package com.back.pinco.domain.user.controller;
 
-import com.back.pinco.domain.likes.dto.PinsLikedByUserResponse;
+import com.back.pinco.domain.likes.dto.LikedPinsResponse;
 import com.back.pinco.domain.likes.service.LikesService;
 import com.back.pinco.domain.pin.dto.PinDto;
 import com.back.pinco.domain.pin.entity.Pin;
@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.websocket.OnError;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -172,7 +171,7 @@ public class UserController {
 
     @Operation(summary = "사용자가 좋아요 등록한 핀 목록 조회", description = "지정된 userId를 가진 사용자가 좋아요한 모든 핀 목록을 반환합니다.")
     @GetMapping("/{userId}/likespins")
-    public RsData<List<PinsLikedByUserResponse>> getPinsLikedByUser(
+    public RsData<List<LikedPinsResponse>> getPinsLikedByUser(
             @PathVariable("userId") Long userId
     ) {
         return new RsData<>(
