@@ -93,7 +93,7 @@ class AuthService(
     // ========== 선택: 인터페이스 정의(프로젝트에 없으면 아래 두 개를 추가) ==========
     interface RefreshTokenStore {
         fun save(customerId: Long?, refreshToken: String?, ttlMillis: Long)
-        fun findByCustomerId(customerId: Long?): Optional<String?>?
+        fun findByCustomerId(customerId: Long?): String?
         fun deleteByCustomerId(customerId: Long?)
         fun deleteByToken(refreshToken: String?)
     }
