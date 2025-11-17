@@ -49,7 +49,7 @@ class BookmarkControllerTest {
     @Test
     @DisplayName("t1_1. 북마크 생성 성공")
     fun t1_1() {
-        val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
+        val user1 = userRepository.findByEmail("user1@example.com")!!
         val pinC = findPinByContent("청계천 산책로 발견 👣")
         val targetPinId = pinC.id
 
@@ -78,7 +78,7 @@ class BookmarkControllerTest {
     @Test
     @DisplayName("t1_2. 북마크 생성 실패 (이미 북마크된 핀)")
     fun t1_2() {
-        val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
+        val user1 = userRepository.findByEmail("user1@example.com")!!
         val pinA = findPinByContent("서울 시청 근처 카페 ☕")
         val targetPinId = pinA.id
 
@@ -126,7 +126,7 @@ class BookmarkControllerTest {
     @Test
     @DisplayName("t1_4. 북마크 생성 실패 (존재하지 않는 핀 ID)")
     fun t1_4() {
-        val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
+        val user1 = userRepository.findByEmail("user1@example.com")!!
         val targetPinId = failedTargetId
 
         val jsonContent: String = """
@@ -152,7 +152,7 @@ class BookmarkControllerTest {
     @Test
     @DisplayName("t2_1. 나의 북마크 목록 조회 성공")
     fun t2_1() {
-        val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
+        val user1 = userRepository.findByEmail("user1@example.com")!!
 
         val resultActions = mvc.perform(
             MockMvcRequestBuilders.get("/api/bookmarks")
@@ -167,7 +167,7 @@ class BookmarkControllerTest {
     @Test
     @DisplayName("t2_2. 나의 북마크 목록 조회 성공 (북마크 없음)")
     fun t2_2() {
-        val user3 = userRepository.findByEmail("no@example.com").orElseThrow()
+        val user3 = userRepository.findByEmail("no@example.com")!!
 
         val resultActions = mvc.perform(
             MockMvcRequestBuilders.get("/api/bookmarks")
@@ -215,7 +215,7 @@ class BookmarkControllerTest {
     @Test
     @DisplayName("t3_2. 북마크 삭제 실패 (존재하지 않는 북마크 ID)")
     fun t3_2() {
-        val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
+        val user1 = userRepository.findByEmail("user1@example.com")!!
 
         val resultActions = mvc.perform(
             MockMvcRequestBuilders.delete("/api/bookmarks/{bookmarkId}", failedTargetId)
@@ -230,8 +230,8 @@ class BookmarkControllerTest {
     @Test
     @DisplayName("t3_3. 북마크 삭제 실패 (소유자가 아님)")
     fun t3_3() {
-        val user1 = userRepository.findByEmail("user1@example.com").orElseThrow()
-        val user2 = userRepository.findByEmail("user2@example.com").orElseThrow()
+        val user1 = userRepository.findByEmail("user1@example.com")!!
+        val user2 = userRepository.findByEmail("user2@example.com")!!
         val pinA = findPinByContent("서울 시청 근처 카페 ☕")
         val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA)
             ?: throw RuntimeException("테스트 설정 실패: 북마크를 찾을 수 없음")
