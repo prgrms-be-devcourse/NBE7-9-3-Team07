@@ -26,6 +26,10 @@ data object ContentField : ValidationField {
     override fun name(): String = "content"
 }
 
+data object keyword : ValidationField {
+    override fun name(): String = "keyword"
+}
+
 data class UnknownField(private val name: String) : ValidationField {
     override fun name() : String = name
 }
