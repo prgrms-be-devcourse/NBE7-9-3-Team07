@@ -12,6 +12,7 @@ import com.back.pinco.global.exception.ServiceException
 import com.back.pinco.global.security.JwtTokenProvider
 import org.assertj.core.api.Assertions
 import org.hamcrest.Matchers
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -20,11 +21,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.transaction.annotation.Transactional
-import java.util.function.Supplier
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -1129,7 +1130,7 @@ class PinControllerTest {
 
         // when & then
         mvc.perform(
-            MockMvcRequestBuilders.post("/api/pins/$pinId/likes" )
+            MockMvcRequestBuilders.post("/api/pins/$pinId/likes")
                 .header("Authorization", "Bearer ${testUser.apiKey} $jwtToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody) //                                .with(csrf())
@@ -1144,8 +1145,9 @@ class PinControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.likeCount").value(likeCnt + 1))
 
         // DB 검증
-        val likes = likesRepository.findByPinIdAndUserId(pinId, userId)
-            .orElseThrow(Supplier { ServiceException(ErrorCode.LIKES_CREATE_FAILED) })
+        val likes =
+            likesRepository.findByPinIdAndUserId(pinId, userId)
+                ?: throw ServiceException(ErrorCode.LIKES_CREATE_FAILED)
         //        assertThat(likes.getLiked()).isTrue();
         Assertions.assertThat(likes.pin.id).isEqualTo(pinId)
         Assertions.assertThat(likes.user.id).isEqualTo(userId)
@@ -1178,7 +1180,7 @@ class PinControllerTest {
 
         // DB 검증
         val likes = likesRepository.findByPinIdAndUserId(pinId, userId)
-        Assertions.assertThat(likes).isEmpty()
+        Assertions.assertThat(likes).isNull()
     }
 
     //    @Test
@@ -1238,7 +1240,7 @@ class PinControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.likeCount").value(lcount - 1))
 
         // DB 검증
-        val likes = likesRepository.findByPinIdAndUserId(pinId, userId).orElse(null)
+        val likes = likesRepository.findByPinIdAndUserId(pinId, userId)
         Assertions.assertThat(likes).isNull()
     }
 
@@ -1270,7 +1272,7 @@ class PinControllerTest {
 
         // DB 검증
         val likes = likesRepository.findByPinIdAndUserId(pinId, userId)
-            .orElseThrow(Supplier { ServiceException(ErrorCode.LIKES_CREATE_FAILED) })
+            ?: throw ServiceException(ErrorCode.LIKES_CREATE_FAILED)
         Assertions.assertThat(likes.pin.id).isEqualTo(pinId)
         Assertions.assertThat(likes.user.id).isEqualTo(userId)
         Assertions.assertThat(likes.modifiedAt).isNotNull()
@@ -1301,7 +1303,7 @@ class PinControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.isLiked").value(false))
 
         // DB 검증
-        val likes = likesRepository.findByPinIdAndUserId(pinId, userId).orElse(null)
+        val likes = likesRepository.findByPinIdAndUserId(pinId, userId)
         Assertions.assertThat(likes).isNull()
 
         // 좋아요 재등록
@@ -1319,7 +1321,7 @@ class PinControllerTest {
 
         // DB 검증
         likesRepository.findByPinIdAndUserId(pinId, userId)
-            .orElseThrow(Supplier { ServiceException(ErrorCode.LIKES_CREATE_FAILED) })
+            ?: throw ServiceException(ErrorCode.LIKES_CREATE_FAILED)
     }
 
 
@@ -1415,34 +1417,20 @@ class PinControllerTest {
     fun likesGetUsersWhoLikedPinF() {
         // given
         val pinId = 4L
-
         val userIds = likesRepository.findUsersByPinId(pinId)
-            .map { it.id!!.toInt() }
+            .mapNotNull { it.id }
             .toTypedArray()
 
 
         // when & then
-        mvc.perform(
-            MockMvcRequestBuilders.get("/api/pins/$pinId/likesusers")
-                .header(
-                    "Authorization",
-                    "Bearer ${testUser.apiKey} $jwtToken"
-                ) //                                .with(csrf())
-            //                                .with(user("testuser").roles("USER"))  // 인증 사용자 추가
-        )
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(MockMvcResultMatchers.handler().handlerType(PinController::class.java))
-            .andExpect(MockMvcResultMatchers.handler().methodName("getUsersWhoLikedPin"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("200"))
-
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data").isArray())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.length()").value(0))
-            .andExpect(
-                MockMvcResultMatchers.jsonPath(
-                    "$.data[*].id",
-                    Matchers.containsInAnyOrder(*userIds)
-                )
-            )
+        mvc.get("/api/pins/$pinId/likesusers") {
+            header("Authorization", "Bearer ${testUser.apiKey} $jwtToken")
+        }.andExpect {
+            status { isOk() }
+            jsonPath("$.errorCode") { value("200") }
+            jsonPath("$.data") { isArray() }
+            jsonPath("$.data.length()") { value(0) }
+            jsonPath("$.data[*].id") { value(containsInAnyOrder(*userIds))}
+        }
     }
 }
