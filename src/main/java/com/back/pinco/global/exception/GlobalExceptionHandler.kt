@@ -34,6 +34,7 @@ class GlobalExceptionHandler {
             is LatitudeField -> ErrorCode.INVALID_PIN_LATITUDE
             is LongitudeField -> ErrorCode.INVALID_PIN_LONGITUDE
             is ContentField -> ErrorCode.INVALID_PIN_CONTENT
+            is keyword -> ErrorCode.INVALID_TAG_KEYWORD
             is UnknownField -> ErrorCode.INVALID_VALUE
         }
 
