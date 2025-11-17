@@ -92,7 +92,7 @@ class BookmarkService(
             throw ServiceException(ErrorCode.BOOKMARK_DELETE_FAILED)
         }
 
-        bookmarkRepository.save(bookmark)
     }
+
 
 }
