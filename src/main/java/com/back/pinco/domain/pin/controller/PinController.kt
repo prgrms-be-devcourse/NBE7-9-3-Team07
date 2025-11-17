@@ -1,7 +1,7 @@
 package com.back.pinco.domain.pin.controller
 
 import com.back.pinco.domain.bookmark.dto.BookmarkDto
-import com.back.pinco.domain.bookmark.dto.addBookmarkRequest
+import com.back.pinco.domain.bookmark.dto.AddBookmarkRequest
 import com.back.pinco.domain.bookmark.service.BookmarkService
 import com.back.pinco.domain.likes.dto.PinLikedUserResponse
 import com.back.pinco.domain.likes.dto.PinLikesRequest
@@ -315,10 +315,10 @@ class PinController(
     @Operation(summary = "핀 북마크 등록 - pinId", description = "핀을 id로 조회하여 북마크에 등록")
     @PostMapping("{pinId}/bookmarks")
     fun addBookmark(
-        @RequestBody requestDto: addBookmarkRequest
+        @RequestBody requestDto: AddBookmarkRequest
     ): RsData<BookmarkDto> {
-
-        val bookmarkDto = bookmarkService.addBookmark(rq.actor?.id, requestDto.pinId)
+        val userId = rq.getActorIdOrThrow()
+        val bookmarkDto = bookmarkService.addBookmark(userId, requestDto.pinId)
 
         return RsData(
             "200",

@@ -1,6 +1,8 @@
 package com.back.pinco.global.rq
 
 import com.back.pinco.domain.user.entity.User
+import com.back.pinco.global.exception.ErrorCode
+import com.back.pinco.global.exception.ServiceException
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -22,6 +24,11 @@ class Rq (
                 ?.let{
                     it as? User
                 }
+
+
+    // 인증된 사용자 ID를 반환, 없으면 예외 발생
+    fun getActorIdOrThrow(): Long =
+        actor?.id ?: throw ServiceException(ErrorCode.AUTH_REQUIRED)
 
     fun getHeader(name: String, defaultValue: String): String =
         request.getHeader(name)?:defaultValue
