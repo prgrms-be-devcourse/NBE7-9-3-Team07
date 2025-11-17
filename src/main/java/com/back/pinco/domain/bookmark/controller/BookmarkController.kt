@@ -29,7 +29,7 @@ class BookmarkController(
         )
     }
 
-    @Operation(summary = "북마크 삭제 (Soft Delete)", description = "특정 북마크를 소프트 삭제 처리")
+    @Operation(summary = "북마크 삭제 (Hard Delete)", description = "특정 북마크를 하드 삭제 처리")
     @DeleteMapping("/{bookmarkId}")
     fun deleteBookmark(@PathVariable bookmarkId: Long): RsData<Unit> {
         val userId = rq.getActorIdOrThrow()
