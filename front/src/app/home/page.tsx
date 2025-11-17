@@ -102,6 +102,8 @@ export default function PinCoMainPage() {
 
     useEffect(() => {
         const t = setInterval(() => {
+
+
             const w = window as any;
             if (w.kakao?.maps) {
                 w.kakao.maps.load(() => setKakaoReady(true));
@@ -127,9 +129,12 @@ export default function PinCoMainPage() {
         },
     });
 
-    const [radius, setRadius] = useState(1000.0);
 
-    const updateRadiusFromScreen = () => {
+
+    const [screenBounds, setScreenBounds] = useState<number[]>([0,0,0,0]);
+
+    // ✅ 화면 끝점 계산
+    const updateScreenBounds = () => {
         const kakao = (window as any).kakao;
         const map = (window as any).mapRef;
         if (!kakao?.maps || !map) return;
@@ -138,51 +143,35 @@ export default function PinCoMainPage() {
         const sw = bounds.getSouthWest();
         const ne = bounds.getNorthEast();
 
-        const R = 6371000;
-        const toRad = (deg: number) => (deg * Math.PI) / 180;
-        const dLat = toRad(ne.getLat() - sw.getLat());
-        const dLng = toRad(ne.getLng() - sw.getLng());
-        const a =
-            Math.sin(dLat / 2) ** 2 +
-            Math.cos(toRad(sw.getLat())) *
-            Math.cos(toRad(ne.getLat())) *
-            Math.sin(dLng / 2) ** 2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const diagonal = R * c;
+        const newBounds = [ne.getLat(), ne.getLng(), sw.getLat(), sw.getLng()];
 
-        const newRadius = diagonal / 2;
-        setRadius(newRadius);
+        setScreenBounds(newBounds);
+
+        if (mode === "screen") loadAllPins(newBounds);
+
     };
+
 
     useEffect(() => {
         if (!kakaoReady) return;
-
         const kakao = (window as any).kakao;
         const map = (window as any).mapRef;
         if (!kakao?.maps || !map) return;
 
         const handleMapIdle = () => {
-            updateRadiusFromScreen();
-
-            if (mode === "screen") {
-                loadAllPins(center.lat, center.lng, radius);
-            }
+            updateScreenBounds();
         };
 
         kakao.maps.event.addListener(map, "idle", handleMapIdle);
-
-        updateRadiusFromScreen();
-        if (mode === "screen") {
-            loadAllPins(center.lat, center.lng, radius);
-        }
+        updateScreenBounds(); // 초기 로드
 
         return () => {
             kakao.maps.event.removeListener(map, "idle", handleMapIdle);
         };
-    }, [kakaoReady, mode, center.lat, center.lng, radius]);
+    }, [kakaoReady, mode]);
+
 
     const [showCreate, setShowCreate] = useState(false);
-
     useEffect(() => {
         if (rightClickCenter) {
             if (!user) {
@@ -226,7 +215,7 @@ export default function PinCoMainPage() {
                     }}
                     // ✅ 모드 변경: 필터 초기화하고 지도에서 찾기
                     onClickAll={() => {
-                        loadAllPins(center.lat, center.lng, radius);
+                        loadAllPins(screenBounds);
                     }}
                     // ✅ 모드 변경: 필터 초기화하고 주변 보기
                     onClickNearBy={() => {
@@ -270,12 +259,12 @@ export default function PinCoMainPage() {
                             onClose={() => setSelectedPin(null)}
                             userId={user?.id ?? null}
                             onChanged={async () => {
-                                if (mode === "screen") await loadAllPins(center.lat, center.lng, radius);
+                                if (mode === "screen") await loadAllPins(screenBounds);
                                 else if (mode === "nearby") await loadNearbyPins(center.lat, center.lng);
                                 else if (mode === "tag") await applyTagFilter(selectedTags);
                                 else if (mode === "bookmark") await loadMyBookmarks();
                                 else if (mode === "liked") await loadLikedPins();
-                                else await loadAllPins();
+                                else await loadAllPins(screenBounds);
                             }}
                         />
                     )}
@@ -290,12 +279,12 @@ export default function PinCoMainPage() {
                                 setRightClickCenter(null);
                             }}
                             onCreated={async () => {
-                                if (mode === "screen") await loadAllPins(center.lat, center.lng, radius);
+                                if (mode === "screen") await loadAllPins(screenBounds);
                                 else if (mode === "nearby") await loadNearbyPins(center.lat, center.lng);
                                 else if (mode === "tag") await applyTagFilter(selectedTags);
                                 else if (mode === "bookmark") await loadMyBookmarks();
                                 else if (mode === "liked") await loadLikedPins();
-                                else await loadAllPins();
+                                else await loadAllPins(screenBounds);
                             }}
                             onTagsUpdated={async () => {
                                 await reloadTags();
