@@ -8,16 +8,16 @@ data class UserDto(
     val email: String,
     val userName: String,
     val password: String,
-    val createdAt: LocalDateTime?,
-    val modifiedAt: LocalDateTime?
+    val createdAt: LocalDateTime,
+    val modifiedAt: LocalDateTime
 ) {
     constructor(user: User) : this(
         user.id!!,
         user.email,
         user.userName,
         user.password,
-        user.createdAt,
-        user.modifiedAt
+        user.createdAt!!,
+        user.modifiedAt!!
     )
 }
 

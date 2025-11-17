@@ -7,7 +7,7 @@ data class JoinResponse(
     val id: Long,
     val email: String,
     val userName: String,
-    val createdAt: LocalDateTime?
+    val createdAt: LocalDateTime
 ) {
     constructor(userDto: UserDto) : this(
         userDto.id,
