@@ -1,6 +1,6 @@
 package com.back.pinco.domain.user.controller
 
-import com.back.pinco.domain.likes.dto.PinsLikedByUserResponse
+import com.back.pinco.domain.likes.dto.LikedPinsResponse
 import com.back.pinco.domain.likes.service.LikesService
 import com.back.pinco.domain.user.dto.UserDto
 import com.back.pinco.domain.user.dto.UserReqBody.DeleteRequest
@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import lombok.RequiredArgsConstructor
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "User", description = "회원 관리 기능")
@@ -173,7 +172,7 @@ class UserController(
     @GetMapping("/{userId}/likespins")
     fun getPinsLikedByUser(
         @PathVariable("userId") userId: Long
-    ): RsData<List<PinsLikedByUserResponse>> {
+    ): RsData<List<LikedPinsResponse>> {
         return RsData(
             "200",
             "성공적으로 처리되었습니다", likesService.getPinsLikedByUser(userId)
