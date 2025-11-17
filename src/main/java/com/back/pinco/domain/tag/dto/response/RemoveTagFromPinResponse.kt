@@ -1,7 +1,6 @@
-package com.back.pinco.domain.tag.dto.response;
+package com.back.pinco.domain.tag.dto.response
 
-public record RemoveTagFromPinResponse(
-        Long pinId,
-        Long tagId
-) {
-}
+data class RemoveTagFromPinResponse(
+    val pinId: Long,
+    val tagId: Long
+)

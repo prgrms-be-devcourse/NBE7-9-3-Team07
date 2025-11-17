@@ -1,46 +1,34 @@
-package com.back.pinco.domain.pin.dto;
+package com.back.pinco.domain.pin.dto
 
-import com.back.pinco.domain.pin.entity.Pin;
-import com.back.pinco.domain.tag.dto.PinTagDto;
-import com.back.pinco.domain.tag.dto.TagDto;
-import com.back.pinco.domain.tag.entity.PinTag;
-import com.back.pinco.domain.tag.entity.Tag;
+import com.back.pinco.domain.pin.entity.Pin
+import com.back.pinco.domain.tag.entity.PinTag
+import com.back.pinco.domain.tag.entity.Tag
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-
-public record PinDto(
-        Long id,
-        Double latitude,
-        Double longitude,
-        String content,
-        Long userId,
-        List<String> pinTags,
-        int likeCount,
-        Boolean isPublic,
-        LocalDateTime createdAt,
-        LocalDateTime modifiedAt
+data class PinDto(
+    val id: Long?,
+    val latitude: Double,
+    val longitude: Double,
+    val content: String,
+    val userId: Long?,
+    val pinTags: List<String>,
+    val likeCount: Int,
+    val isPublic: Boolean,
+    val createdAt: LocalDateTime?,
+    val modifiedAt: LocalDateTime?
 ) {
-    public PinDto(Pin pin) {
-        this(
-                pin.getId(),
-                pin.getPoint().getY(),
-                pin.getPoint().getX(),
-                pin.getContent(),
-                pin.getUser().getId(),
-                pin.getPinTags().stream()
-                        .map(PinTag::getTag)
-                        .map(Tag::getKeyword)
-                        .collect(Collectors.toList()),
-                pin.getLikeCount(),
-                pin.isPublic(),
-                pin.getCreatedAt(),
-                pin.getModifiedAt()
-        );
-    }
-
-
-
+    constructor(pin: Pin) : this(
+        pin.id,
+        pin.point.getY(),
+        pin.point.getX(),
+        pin.content,
+        pin.user.id,
+        pin.pinTags
+            .map(PinTag::tag)
+            .map(Tag::keyword),
+        pin.likeCount,
+        pin.isPublic,
+        pin.createdAt,
+        pin.modifiedAt
+    )
 }

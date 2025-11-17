@@ -1,18 +1,15 @@
-package com.back.pinco.domain.tag.dto;
+package com.back.pinco.domain.tag.dto
 
-import com.back.pinco.domain.tag.entity.PinTag;
-import java.time.LocalDateTime;
+import com.back.pinco.domain.tag.entity.PinTag
 
-public record PinTagDto(
-        Long id,
-        Long pinId,
-        TagDto tag
+data class PinTagDto(
+    val id: Long?,
+    val pinId: Long?,
+    val tag: TagDto
 ) {
-    public PinTagDto(PinTag pinTag) {
-        this(
-                pinTag.getId(),
-                pinTag.getPin().getId(),
-                new TagDto(pinTag.getTag())
-        );
-    }
+    constructor(pinTag: PinTag) : this(
+        pinTag.id,
+        pinTag.pin.id,
+        TagDto(pinTag.tag)
+    )
 }

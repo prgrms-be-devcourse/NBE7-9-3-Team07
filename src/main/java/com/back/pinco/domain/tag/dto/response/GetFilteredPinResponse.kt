@@ -1,12 +1,10 @@
-package com.back.pinco.domain.tag.dto.response;
+package com.back.pinco.domain.tag.dto.response
 
-import com.back.pinco.domain.pin.dto.PinDto;
-import com.back.pinco.domain.pin.entity.Pin;
+import com.back.pinco.domain.pin.dto.PinDto
+import com.back.pinco.domain.pin.entity.Pin
 
-public record GetFilteredPinResponse(
-        PinDto pin
+data class GetFilteredPinResponse(
+    val pin: PinDto
 ) {
-    public GetFilteredPinResponse(Pin pin) {
-        this(new PinDto(pin));
-    }
+    constructor(pin: Pin) : this(PinDto(pin))
 }

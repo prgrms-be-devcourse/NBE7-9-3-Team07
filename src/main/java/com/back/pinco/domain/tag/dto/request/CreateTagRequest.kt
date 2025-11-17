@@ -1,5 +1,6 @@
-package com.back.pinco.domain.tag.dto.request;
+package com.back.pinco.domain.tag.dto.request
 
-public record CreateTagRequest(
-        String keyword
-) {}
+
+data class CreateTagRequest(
+    val keyword: String
+)

@@ -1,8 +1,8 @@
-package com.back.pinco.domain.tag.dto.response;
+package com.back.pinco.domain.tag.dto.response
 
-import com.back.pinco.domain.tag.dto.PinTagDto;
+import com.back.pinco.domain.tag.dto.PinTagDto
 
-public record AddTagToPinResponse(
-        Long pinId,
-        PinTagDto pinTag
-) {}
+data class AddTagToPinResponse(
+    val pinId: Long,
+    val pinTag: PinTagDto
+) 

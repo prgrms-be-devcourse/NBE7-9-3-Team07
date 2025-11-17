@@ -1,7 +1,6 @@
-package com.back.pinco.domain.tag.dto.response;
+package com.back.pinco.domain.tag.dto.response
 
-public record RestoreTagFromPinResponse(
-        Long pinId,
-        Long tagId
-) {
-}
+data class RestoreTagFromPinResponse(
+    val pinId: Long,
+    val tagId: Long
+)

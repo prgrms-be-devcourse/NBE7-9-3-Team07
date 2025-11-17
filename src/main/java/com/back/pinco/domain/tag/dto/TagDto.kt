@@ -1,18 +1,16 @@
-package com.back.pinco.domain.tag.dto;
+package com.back.pinco.domain.tag.dto
 
-import com.back.pinco.domain.tag.entity.Tag;
-import java.time.LocalDateTime;
+import com.back.pinco.domain.tag.entity.Tag
+import java.time.LocalDateTime
 
-public record TagDto(
-        Long id,
-        String keyword,
-        LocalDateTime createdAt
+data class TagDto(
+    val id: Long?,
+    val keyword: String?,
+    val createdAt: LocalDateTime?
 ) {
-    public TagDto(Tag tag) {
-        this(
-                tag.getId(),
-                tag.getKeyword(),
-                tag.getCreatedAt()
-        );
-    }
+    constructor(tag: Tag) : this(
+        tag.id,
+        tag.keyword,
+        tag.createdAt
+    )
 }

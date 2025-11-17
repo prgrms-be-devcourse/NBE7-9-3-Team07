@@ -1,8 +1,6 @@
-package com.back.pinco.domain.tag.dto.response;
+package com.back.pinco.domain.tag.dto.response
 
-import java.util.List;
-
-public record GetPinsByMultipleTagsResponse(
-        List<String> keywords,
-        List<GetFilteredPinResponse> pins
-) {}
+data class GetPinsByMultipleTagsResponse(
+    val keywords: List<String>,
+    val pins: List<GetFilteredPinResponse>
+)

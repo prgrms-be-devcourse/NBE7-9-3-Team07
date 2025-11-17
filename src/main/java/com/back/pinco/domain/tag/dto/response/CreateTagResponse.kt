@@ -1,8 +1,7 @@
-package com.back.pinco.domain.tag.dto.response;
+package com.back.pinco.domain.tag.dto.response
 
-import com.back.pinco.domain.tag.dto.TagDto;
+import com.back.pinco.domain.tag.dto.TagDto
 
-public record CreateTagResponse(
-        TagDto tag
-) {
-}
+data class CreateTagResponse(
+    val tag: TagDto
+) 
