@@ -386,7 +386,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t10() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
 
         // when & then
@@ -438,7 +438,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t12() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldRaw = "12345678" // 실제 비번에 맞게
         val email = actor.email
@@ -495,7 +495,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t13() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldRaw = "12345678" // 실제 비번에 맞게
         val email = actor.email
@@ -548,7 +548,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t14() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldRaw = "12345678" // 실제 비번에 맞게
         val email = actor.email
@@ -607,7 +607,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t15() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldPassWd = "12341234"
         val newName = "새유저"
@@ -645,7 +645,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t16() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldPassWd = "12345678"
         val newName = "새"
@@ -683,7 +683,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t17() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldPassWd = "12345678"
         val newName = "유저2"
@@ -721,7 +721,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t18() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldPassWd = "12345678"
         val newName = "새유저"
@@ -759,7 +759,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t19() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldPassWd = "12345678"
         val newName = "새"
@@ -797,7 +797,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t20() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldPassWd = "12345678"
         val newName = "유저2"
@@ -835,7 +835,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t21() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldPassWd = "12345678"
         val newName = "새유저"
@@ -873,7 +873,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t22() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val oldPassWd = "12345678"
         val newName = "새유저"
@@ -911,7 +911,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t23() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val rawPwd = "12345678"
 
@@ -952,7 +952,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t24() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
         val rawPwd = "12341234"
 
@@ -988,7 +988,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t25() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
 
         val resultActions = mvc
@@ -1042,7 +1042,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t27() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
 
         val myPinCount = pinService.findByUserId(actor, actor).size
@@ -1078,7 +1078,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t28() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
 
         val resultActions = mvc
@@ -1109,7 +1109,7 @@ class UserControllerIntegrationTest {
         Exception::class
     )
     fun t29() {
-        val actor = userRepository.findByUserName("유저1").get()
+        val actor = userRepository.findByUserName("유저1")!!
         val apiKey = actor.apiKey
 
         val resultActions = mvc

@@ -130,7 +130,7 @@ class UserController(
     @GetMapping("/getInfo")
     @Operation(summary = "회원 정보 조회", description = "id, 이메일, 회원 이름을 조회합니다.")
     fun getUserInfo(): RsData<GetInfoResponse> {
-            val user = rq.getActor()
+            val user = rq.getActorOrNull()
             return RsData(
                 "200",
                 "회원 정보를 성공적으로 조회했습니다.",
@@ -143,7 +143,7 @@ class UserController(
     fun edit(
         @RequestBody reqBody: EditRequest
     ): RsData<Void> {
-        val currentUser = rq.getActor()
+        val currentUser = rq.getActorOrNull()
         userService.checkPwd(currentUser, reqBody.password)
         userService.editUserInfo(currentUser.id!!, reqBody.newUserName, reqBody.newPassword)
         return RsData(
@@ -158,7 +158,7 @@ class UserController(
     fun delete(
         @RequestBody reqBody: DeleteRequest
     ): RsData<Void> {
-        val user = rq.getActor()
+        val user = rq.getActorOrNull()
         userService.checkPwd(user, reqBody.password)
         userService.delete(user)
         rq.deleteCookie("accessToken")
@@ -185,7 +185,7 @@ class UserController(
     @GetMapping("/mypage")
     fun myPage(): RsData<MyPageResponse> {
         // 로그인 사용자
-        val user = rq.getActor()
+        val user = rq.getActorOrNull()
         val listPin = userService.getMyPins() // DB 접근은 한 번만
 
         //내가 작성한 핀 개수

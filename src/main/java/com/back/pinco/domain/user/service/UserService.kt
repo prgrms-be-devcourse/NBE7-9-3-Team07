@@ -200,13 +200,13 @@ class UserService(
 
     @Transactional(readOnly = true)
     fun getMyPins() : List<Pin> {
-        val user = rq.getActor()
+        val user = rq.getActorOrNull()
         return pinService.findByUserId(user, user)
     }
 
     @Transactional(readOnly = true)
     fun getMyBookmarks() : List<BookmarkDto> {
-        val user = rq.getActor()
+        val user = rq.getActorOrNull()
         return bookmarkService.getMyBookmarks(user.id!!)
     }
 
@@ -220,7 +220,7 @@ class UserService(
 
     @Transactional(readOnly = true)
     fun listPublicAndPrivate(): MyPinResponse {
-        val user = rq.getActor()
+        val user = rq.getActorOrNull()
 
         // DB 한 번
         val accessible = pinService.findByUserId(user, user)

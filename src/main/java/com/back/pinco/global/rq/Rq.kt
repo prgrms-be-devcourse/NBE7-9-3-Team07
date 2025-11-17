@@ -26,7 +26,7 @@ class Rq (
                 }
 
     // actor 반환
-    fun getActor(): User =
+    fun getActorOrNull(): User =
         actor ?: throw ServiceException(ErrorCode.AUTH_REQUIRED)
 
     // 인증된 사용자 ID를 반환, 없으면 예외 발생
