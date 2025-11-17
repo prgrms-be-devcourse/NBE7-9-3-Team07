@@ -48,7 +48,7 @@ public class TagController {
         return new RsData<>("200", "핀의 태그 목록 조회 성공", new GetTagsByPinResponse(pinId, tags));
     }
 
-    // 태그 삭제 (Soft Delete)
+    // 태그 삭제
     @DeleteMapping("/pins/{pinId}/tags/{tagId}")
     public RsData<RemoveTagFromPinResponse> removeTagFromPinResponse(
             @PathVariable Long pinId,
@@ -59,20 +59,6 @@ public class TagController {
                 "200",
                 "태그가 삭제되었습니다.",
                 new RemoveTagFromPinResponse(pinId, tagId)
-        );
-    }
-
-    // 태그 복구 (관리자용)
-    @PatchMapping("/pins/{pinId}/tags/{tagId}/restore")
-    public RsData<RestoreTagFromPinResponse> restoreTagFromPinResponse(
-            @PathVariable Long pinId,
-            @PathVariable Long tagId
-    ) {
-        pinTagService.restoreTagFromPin(pinId, tagId);
-        return new RsData<>(
-                "200",
-                "태그가 복구되었습니다.",
-                new RestoreTagFromPinResponse(pinId, tagId)
         );
     }
 
