@@ -1046,7 +1046,7 @@ class UserControllerIntegrationTest {
         val apiKey = actor.apiKey
 
         val myPinCount = pinService.findByUserId(actor, actor).size
-        val bookmarkCount = bookmarkService.getMyBookmarks(actor.id).size
+        val bookmarkCount = bookmarkService.getMyBookmarks(actor.id!!).size
         val likesCount = userService.likesCount(pinService.findByUserId(actor, actor))
 
 
