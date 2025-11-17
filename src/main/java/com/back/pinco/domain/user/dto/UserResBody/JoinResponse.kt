@@ -4,7 +4,7 @@ import com.back.pinco.domain.user.dto.UserDto
 import java.time.LocalDateTime
 
 data class JoinResponse(
-    val id: Long?,
+    val id: Long,
     val email: String,
     val userName: String,
     val createdAt: LocalDateTime?

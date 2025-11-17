@@ -4,7 +4,7 @@ import com.back.pinco.domain.user.entity.User
 import java.time.LocalDateTime
 
 data class UserDto(
-    val id: Long?,
+    val id: Long,
     val email: String,
     val userName: String,
     val password: String,
@@ -12,7 +12,7 @@ data class UserDto(
     val modifiedAt: LocalDateTime?
 ) {
     constructor(user: User) : this(
-        user.id,
+        user.id!!,
         user.email,
         user.userName,
         user.password,
