@@ -9,6 +9,7 @@ import com.back.pinco.domain.tag.repository.TagRepository
 import com.back.pinco.global.exception.ErrorCode
 import com.back.pinco.global.exception.ServiceException
 import lombok.RequiredArgsConstructor
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.CollectionUtils
@@ -172,7 +173,7 @@ class PinTagService(
             val pintag= pinTagRepository.save<PinTag>(PinTag(pin, tag))
             pinTagRepository.flush()
             return pintag
-        } catch (e: org.springframework.dao.DataIntegrityViolationException) {
+        } catch (e: DataIntegrityViolationException) {
             throw ServiceException(ErrorCode.TAG_ALREADY_LINKED)
         }catch (_: Exception) {
             throw ServiceException(ErrorCode.TAG_CREATE_FAILED)
