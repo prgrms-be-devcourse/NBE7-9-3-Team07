@@ -1,11 +1,15 @@
 package com.back.pinco.global.geometry
 
-import ch.hsr.geohash.BoundingBox
 import ch.hsr.geohash.GeoHash
 
 object GeoHashUtil {
+    private val precision=5
 
-    fun getCoveringGeoHashes(latMin: Double, lngMin: Double, latMax: Double, lngMax: Double, precision: Int = 5): Set<String> {
+    fun getCoveringGeoHashe(lat: Double, lon: Double ): String {
+
+        return GeoHash.withCharacterPrecision(lat, lon, precision).toBase32()
+    }
+    fun getCoveringGeoHashes(latMin: Double, lngMin: Double, latMax: Double, lngMax: Double ): Set<String> {
         val hashes = mutableSetOf<String>()
 
         val step = 0.01 //격자 단위 (위도 경도 각 0.01도)
@@ -23,7 +27,6 @@ object GeoHashUtil {
         return hashes
     }
 
-    fun generateGeoCacheKey(hash: String) = "pin:cache:$hash"
 
     fun boundingBoxOfGeoHash(hash: String): List<Double> {
         val geoHash = GeoHash.fromGeohashString(hash)
