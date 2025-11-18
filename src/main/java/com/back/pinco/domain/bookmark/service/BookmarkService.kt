@@ -64,8 +64,8 @@ class BookmarkService(
         val user = userRepository.findById(userId)
             .orElseThrow { ServiceException(ErrorCode.BOOKMARK_INVALID_USER_INPUT) }
 
-        // 삭제되지 않은 북마크 목록만 조회
-        val bookmarks: List<Bookmark> = bookmarkRepository.findByUserAndDeletedFalse(user)
+        // 삭제되지 않은 북마크 목록을 페치조인으로 한 번에 조회해 N+1을 방지
+        val bookmarks: List<Bookmark> = bookmarkRepository.findByUserFetchPinAndTags(user)
 
         return bookmarks.map { BookmarkDto(it) }
     }
