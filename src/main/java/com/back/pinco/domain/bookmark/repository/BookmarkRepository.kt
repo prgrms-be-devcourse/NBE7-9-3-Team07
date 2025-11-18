@@ -26,7 +26,7 @@ interface BookmarkRepository : JpaRepository<Bookmark, Long> {
             "JOIN FETCH p.user u " +
             "LEFT JOIN FETCH p.pinTags pt " +
             "LEFT JOIN FETCH pt.tag t " +
-            "WHERE b.user = :user AND b.deleted = false")
+            "WHERE b.user = :user")
     fun findByUserFetchPinAndTags(@Param("user") user: User): List<Bookmark>
 
     /**
