@@ -34,11 +34,11 @@ class CustomAuthenticationFilter(
             return
         }
 
-        // /api/pins 와 /api/pins/** GET은 공개
-        if (method.equals("GET", ignoreCase = true) && (uri == "/api/pins" || uri.startsWith("/api/pins/"))) {
-            chain.doFilter(req, res)
-            return
-        }
+//        // /api/pins 와 /api/pins/** GET은 공개
+//        if (method.equals("GET", ignoreCase = true) && (uri == "/api/pins" || uri.startsWith("/api/pins/"))) {
+//            chain.doFilter(req, res)
+//            return
+//        } -> 버로 통과시키면 전부 비로그인 상태가 되니까 제거 (추후 로그인 따라서 조회함)
 
         // 공개 경로면 통과 (인증 불필요)
         if (PERMIT_PATHS.contains(uri)) {
