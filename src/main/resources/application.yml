@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env.properties
   datasource:
     url: jdbc:postgresql://localhost:5432/pinco
     username: user
@@ -20,7 +22,7 @@ spring:
       client:
         registration:
           kakao:
-            clientId: ON_SECRET
+            clientId: ${KAKAO_CLIENT_ID}
             scope: profile_nickname
             client-name: Kakao
             authorization-grant-type: authorization_code
