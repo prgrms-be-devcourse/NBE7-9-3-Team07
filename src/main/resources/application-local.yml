@@ -1,7 +1,7 @@
 spring:
   mail:
     username: yunseo2488@gmail.com
-    password: hblsgyjlcczantcu
+    password: // 팀 슬랙 참고
   
   data:
     redis:
