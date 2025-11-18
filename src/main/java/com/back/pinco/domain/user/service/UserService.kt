@@ -52,10 +52,9 @@ class UserService(
 
     @Transactional
     fun createUser(email: String, password: String, userName: String, verificationCode: String): User {
-        if (email.isBlank() || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$".toRegex())
-        ) {
-            throw ServiceException(ErrorCode.INVALID_EMAIL_FORMAT)
-        }
+        // 이메일 형식 검증은 인증코드 발송 시 이미 완료되었으므로 생략
+        // 인증코드가 발송되었다는 것은 이메일 형식이 올바르다는 의미
+        
         if (password.isBlank() || password.length < 8) {
             throw ServiceException(ErrorCode.INVALID_PASSWORD_FORMAT)
         }
@@ -69,7 +68,7 @@ class UserService(
             throw ServiceException(ErrorCode.NICKNAME_ALREADY_EXISTS)
         }
         
-        // 인증코드 검증
+        // 인증코드 검증 (인증코드 발송 시 이메일 형식도 함께 검증됨)
         authService.verifyVerificationCode(email, verificationCode)
         
         val hashedPwd = passwordEncoder.encode(password)

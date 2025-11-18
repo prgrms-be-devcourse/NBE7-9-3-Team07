@@ -209,8 +209,9 @@ class UserControllerIntegrationTest {
         val email = "user1@example.com"
         val userName = "새유저"
         val rawPwd = "12345678"
+        val verificationCode = authService.sendVerificationCode(email)
         val body = """
-      {"email":"${email}","userName":"${userName}","password":"${rawPwd}"}
+      {"email":"${email}","userName":"${userName}","password":"${rawPwd}","verificationCode":"${verificationCode}"}
       
       """
         val resultActions = mvc
@@ -232,32 +233,28 @@ class UserControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("회원가입 실패 - 이메일 형식 오류")
+    @DisplayName("인증코드 발송 실패 - 이메일 형식 오류")
     @Transactional
     @Throws(
         Exception::class
     )
     fun t3() {
-        val email = "yunseo+" + UUID.randomUUID() + ""
-        val userName = "새유저"
-        val rawPwd = "Password123!"
-        val body = """
-      {"email":"${email}","userName":"${userName}","password":"${rawPwd}"}
-      
-      """
+        val email = "yunseo+" + UUID.randomUUID() + ""  // @ 없이 잘못된 형식
+        
+        // 인증코드 발송 시도 (이메일 형식 오류로 실패해야 함)
         val resultActions = mvc
             .perform(
-                MockMvcRequestBuilders.post("/api/user/join")
+                MockMvcRequestBuilders.post("/api/user/send-verification-code")
                     .with(SecurityMockMvcRequestPostProcessors.csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .content(body)
+                    .content("""{"email":"${email}"}""")
             )
             .andDo(MockMvcResultHandlers.print())
 
         resultActions
             .andExpect(MockMvcResultMatchers.handler().handlerType(UserController::class.java))
-            .andExpect(MockMvcResultMatchers.handler().methodName("join"))
+            .andExpect(MockMvcResultMatchers.handler().methodName("sendVerificationCode"))
             .andExpect(MockMvcResultMatchers.status().isBadRequest())
             .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("2001"))
             .andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("이메일 형식이 올바르지 않습니다."))
@@ -273,8 +270,9 @@ class UserControllerIntegrationTest {
         val email = "yunseo+" + UUID.randomUUID() + "@example.com"
         val userName = "새유저"
         val rawPwd = "1234"
+        val verificationCode = authService.sendVerificationCode(email)
         val body = """
-      {"email":"${email}","userName":"${userName}","password":"${rawPwd}"}
+      {"email":"${email}","userName":"${userName}","password":"${rawPwd}","verificationCode":"${verificationCode}"}
       
       """
         val resultActions = mvc
@@ -305,8 +303,9 @@ class UserControllerIntegrationTest {
         val email = "yunseo+" + UUID.randomUUID() + "@example.com"
         val userName = "유"
         val rawPwd = "Password123!"
+        val verificationCode = authService.sendVerificationCode(email)
         val body = """
-      {"email":"${email}","userName":"${userName}","password":"${rawPwd}"}
+      {"email":"${email}","userName":"${userName}","password":"${rawPwd}","verificationCode":"${verificationCode}"}
       
       """
         val resultActions = mvc
@@ -337,8 +336,9 @@ class UserControllerIntegrationTest {
         val email = "potato@example.com"
         val userName = "유저1"
         val rawPwd = "Password123!"
+        val verificationCode = authService.sendVerificationCode(email)
         val body = """
-      {"email":"${email}","userName":"${userName}","password":"${rawPwd}"}
+      {"email":"${email}","userName":"${userName}","password":"${rawPwd}","verificationCode":"${verificationCode}"}
       
       """
         val resultActions = mvc
