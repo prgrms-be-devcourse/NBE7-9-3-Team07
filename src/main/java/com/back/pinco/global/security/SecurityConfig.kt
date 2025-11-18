@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException
 
 @Configuration
-class SecurityConfig (
+class SecurityConfig(
     private val customAuthenticationFilter: CustomAuthenticationFilter
 ) {
     @Bean
@@ -34,22 +34,24 @@ class SecurityConfig (
                 )
             }
             .authorizeHttpRequests { auth ->
-                    auth // CORS preflight
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 공개 API
-                        .requestMatchers("/api/user/join", "/api/user/login", "/api/user/reissue").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/pins/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll() // 그 외 /api/** 는 인증 필요
-                        .requestMatchers("/api/**").authenticated() // Swagger
-                        .requestMatchers(
-                            "/swagger-ui/**",
-                            "/swagger-ui.html",
-                            "/v3/api-docs/**",
-                            "/swagger-resources/**",
-                            "/webjars/**"
-                        ).permitAll() // 나머지는 전부 허용
+                auth // CORS preflight
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 공개 API
+                    .requestMatchers("/api/user/join", "/api/user/login", "/api/user/reissue").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/pins/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll() // 그 외 /api/** 는 인증 필요
+                    .requestMatchers("/api/**").authenticated() // Swagger
+                    .requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                    ).permitAll() // 나머지는 전부 허용
 
-                        .anyRequest().permitAll()
-                }
+                    .anyRequest().permitAll()
+            }
+
+            .oauth2Login { oauth2 -> {} }
 
             .exceptionHandling { ex: ExceptionHandlingConfigurer<HttpSecurity?> ->
                 ex // 인증 실패 (로그인 안함, 잘못된 apiKey 등) → 401로 통일
