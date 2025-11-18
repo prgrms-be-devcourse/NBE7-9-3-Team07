@@ -20,7 +20,8 @@ import java.io.IOException
 
 @Configuration
 class SecurityConfig(
-    private val customAuthenticationFilter: CustomAuthenticationFilter
+    private val customAuthenticationFilter: CustomAuthenticationFilter,
+    private val oAuth2SuccessHandler: CustomOAuth2LoginSuccessHandler
 ) {
     @Bean
     @Throws(Exception::class)
@@ -51,7 +52,12 @@ class SecurityConfig(
                     .anyRequest().permitAll()
             }
 
-            .oauth2Login { oauth2 -> {} }
+            // OAuth2 로그인: 성공 시 커스텀 핸들러로 리다이렉트
+            .oauth2Login { oauth2 ->
+                oauth2.successHandler(oAuth2SuccessHandler)
+            }
+
+//            .oauth2ResourceServer { oauth2 -> }
 
             .exceptionHandling { ex: ExceptionHandlingConfigurer<HttpSecurity?> ->
                 ex // 인증 실패 (로그인 안함, 잘못된 apiKey 등) → 401로 통일
