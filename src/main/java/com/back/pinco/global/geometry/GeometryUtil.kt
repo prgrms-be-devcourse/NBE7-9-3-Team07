@@ -1,12 +1,10 @@
 package com.back.pinco.global.geometry
 
-import lombok.RequiredArgsConstructor
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.Point
 import org.locationtech.jts.geom.PrecisionModel
 
-@RequiredArgsConstructor
 object GeometryUtil {
     const val SRID: Int = 4326 // WGS84 좌표계
     private val geometryFactory = GeometryFactory(PrecisionModel(), SRID)

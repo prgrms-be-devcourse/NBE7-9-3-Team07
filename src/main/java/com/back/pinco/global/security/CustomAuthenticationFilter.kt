@@ -40,8 +40,14 @@ class CustomAuthenticationFilter(
             return
         }
 
-        // /api/* 가 아니거나 공개 경로면 통과
-        if (!uri.startsWith("/api/") || PERMIT_PATHS.contains(uri)) {
+        // 공개 경로면 통과 (인증 불필요)
+        if (PERMIT_PATHS.contains(uri)) {
+            chain.doFilter(req, res)
+            return
+        }
+
+        // /api/* 가 아니면 통과
+        if (!uri.startsWith("/api/")) {
             chain.doFilter(req, res)
             return
         }
@@ -143,7 +149,8 @@ class CustomAuthenticationFilter(
         private val PERMIT_PATHS = listOf(
             "/api/user/join",
             "/api/user/login",
-            "/api/user/reissue"
+            "/api/user/reissue",
+            "/api/user/send-verification-code"
         )
     }
 }

@@ -72,7 +72,7 @@ class BookmarkControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").isNumber())
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.pin.id").value(targetPinId!!.toInt()))
 
-        Assertions.assertThat(bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinC)).isNotNull
+        Assertions.assertThat(bookmarkRepository.findByUserAndPin(user1, pinC)).isNotNull
     }
 
     @Test
@@ -233,7 +233,7 @@ class BookmarkControllerTest {
         val user1 = userRepository.findByEmail("user1@example.com")!!
         val user2 = userRepository.findByEmail("user2@example.com")!!
         val pinA = findPinByContent("서울 시청 근처 카페 ☕")
-        val bookmark1A = bookmarkRepository.findByUserAndPinAndDeletedFalse(user1, pinA)
+        val bookmark1A = bookmarkRepository.findByUserAndPin(user1, pinA)
             ?: throw RuntimeException("테스트 설정 실패: 북마크를 찾을 수 없음")
 
         val targetBookmarkId = bookmark1A.id

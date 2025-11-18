@@ -39,17 +39,4 @@ class Bookmark(
     var id: Long? = null
         protected set
 
-    @Column(name = "is_deleted", nullable = false)
-    var deleted: Boolean = false
-
-
-    // 소프트 삭제
-    fun setDeleted() {
-        deleted = true
-    }
-
-    // 북마크 복구
-    fun restore() {
-        deleted = false
-    }
 }
