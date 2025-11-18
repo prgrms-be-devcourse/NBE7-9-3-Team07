@@ -5,7 +5,6 @@ import com.back.pinco.global.security.JwtTokenProvider
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import lombok.RequiredArgsConstructor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.lang.Nullable
 import org.springframework.stereotype.Service
@@ -13,7 +12,6 @@ import org.springframework.util.StringUtils
 import java.util.*
 
 @Service
-@RequiredArgsConstructor
 class AuthService(
     private val jwttokenProvider: JwtTokenProvider,
     @Autowired(required = false)
