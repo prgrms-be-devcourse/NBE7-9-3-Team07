@@ -7,7 +7,6 @@ import com.back.pinco.global.security.JwtTokenProvider
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import lombok.RequiredArgsConstructor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.lang.Nullable
 import org.springframework.data.redis.core.StringRedisTemplate
@@ -18,7 +17,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 @Service
-@RequiredArgsConstructor
 class AuthService(
     private val jwttokenProvider: JwtTokenProvider,
     private val mailService: MailService,

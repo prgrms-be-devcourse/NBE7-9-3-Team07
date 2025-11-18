@@ -13,14 +13,12 @@ import com.back.pinco.global.exception.ErrorCode
 import com.back.pinco.global.exception.ServiceException
 import com.back.pinco.global.rq.Rq
 import com.back.pinco.global.security.JwtTokenProvider
-import lombok.RequiredArgsConstructor
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
-@RequiredArgsConstructor
 class UserService(
     private val passwordEncoder: PasswordEncoder,
     private val userRepository: UserRepository,

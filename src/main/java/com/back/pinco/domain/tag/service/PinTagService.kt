@@ -8,14 +8,12 @@ import com.back.pinco.domain.tag.repository.PinTagRepository
 import com.back.pinco.domain.tag.repository.TagRepository
 import com.back.pinco.global.exception.ErrorCode
 import com.back.pinco.global.exception.ServiceException
-import lombok.RequiredArgsConstructor
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.CollectionUtils
 
 @Service
-@RequiredArgsConstructor
 class PinTagService(
     private val tagRepository: TagRepository,
     private val pinTagRepository: PinTagRepository,

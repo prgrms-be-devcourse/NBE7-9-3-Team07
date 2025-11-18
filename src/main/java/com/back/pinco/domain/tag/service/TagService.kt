@@ -5,13 +5,11 @@ import com.back.pinco.domain.tag.repository.TagRepository
 import com.back.pinco.global.exception.ErrorCode
 import com.back.pinco.global.exception.ServiceException
 import io.micrometer.common.util.StringUtils
-import lombok.RequiredArgsConstructor
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.CollectionUtils
 
 @Service
-@RequiredArgsConstructor
 class TagService(private val tagRepository: TagRepository) {
 
 

@@ -1,9 +1,7 @@
 package com.back.pinco.global.exception
 
-import lombok.Getter
 import org.springframework.http.HttpStatus
 
-@Getter
 enum class ErrorCode(
     val code: Int,
     val status: HttpStatus,
