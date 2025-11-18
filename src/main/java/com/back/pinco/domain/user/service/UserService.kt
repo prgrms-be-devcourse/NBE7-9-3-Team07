@@ -28,7 +28,8 @@ class UserService(
     private val bookmarkService: BookmarkService,
     private val likesService: LikesService,
     private val pinService: PinService,
-    private val rq: Rq
+    private val rq: Rq,
+    private val authService: AuthService
 ) {
 
 
@@ -50,7 +51,7 @@ class UserService(
 
 
     @Transactional
-    fun createUser(email: String, password: String, userName: String): User {
+    fun createUser(email: String, password: String, userName: String, verificationCode: String): User {
         if (email.isBlank() || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$".toRegex())
         ) {
             throw ServiceException(ErrorCode.INVALID_EMAIL_FORMAT)
@@ -67,10 +68,47 @@ class UserService(
         if (userRepository.existsByUserName(userName)) {
             throw ServiceException(ErrorCode.NICKNAME_ALREADY_EXISTS)
         }
+        
+        // 인증코드 검증
+        authService.verifyVerificationCode(email, verificationCode)
+        
         val hashedPwd = passwordEncoder.encode(password)
         val user = User(email, hashedPwd, userName)
         userRepository.save(user)
         ensureApiKey(user)
+        
+        return user
+    }
+
+    /**
+     * 테스트/초기 데이터용 사용자 생성 메서드 (인증코드 검증 없음)
+     * 실제 서비스에서는 사용하지 않고, InitData나 테스트에서만 사용
+     */
+    @Transactional
+    fun createUserWithoutVerification(email: String, password: String, userName: String): User {
+        if (email.isBlank() || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$".toRegex())
+        ) {
+            throw ServiceException(ErrorCode.INVALID_EMAIL_FORMAT)
+        }
+        if (password.isBlank() || password.length < 8) {
+            throw ServiceException(ErrorCode.INVALID_PASSWORD_FORMAT)
+        }
+        if (userName.isBlank() || userName.length < 2 || userName.length > 20) {
+            throw ServiceException(ErrorCode.INVALID_USERNAME_FORMAT)
+        }
+        if (userRepository.existsByEmail(email)) {
+            throw ServiceException(ErrorCode.EMAIL_ALREADY_EXISTS)
+        }
+        if (userRepository.existsByUserName(userName)) {
+            throw ServiceException(ErrorCode.NICKNAME_ALREADY_EXISTS)
+        }
+        
+        // 인증코드 검증 없이 사용자 생성
+        val hashedPwd = passwordEncoder.encode(password)
+        val user = User(email, hashedPwd, userName)
+        userRepository.save(user)
+        ensureApiKey(user)
+        
         return user
     }
 

@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: local  # local 프로파일 활성화
+
   datasource:
     url: jdbc:postgresql://localhost:5432/pinco
     username: user
@@ -10,6 +13,16 @@ spring:
       host: redis
       port: 6379
       password: password
+      database: 0
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -25,6 +38,9 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql: TRACE
+    com.back.pinco.global.security: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
 custom:
   jwt:
     secret: "aVeryLongSecretKey_ChangeMe_2025!"

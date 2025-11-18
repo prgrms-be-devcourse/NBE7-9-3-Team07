@@ -36,7 +36,7 @@ class SecurityConfig (
             .authorizeHttpRequests { auth ->
                     auth // CORS preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 공개 API
-                        .requestMatchers("/api/user/join", "/api/user/login", "/api/user/reissue").permitAll()
+                        .requestMatchers("/api/user/join", "/api/user/login", "/api/user/reissue", "/api/user/send-verification-code").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/pins/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll() // 그 외 /api/** 는 인증 필요
                         .requestMatchers("/api/**").authenticated() // Swagger
