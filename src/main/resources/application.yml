@@ -2,6 +2,9 @@ server:
   forward-headers-strategy: native
 
 spring:
+  config:
+    import: optional:file:.env.properties
+
   datasource:
     url: jdbc:postgresql://localhost:5432/pinco
     username: user
@@ -31,6 +34,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
   devtools:
     restart:
       enabled: false
@@ -41,7 +45,7 @@ spring:
         registration:
           kakao:
             clientId: ${KAKAO_CLIENT_ID}
-            scope: profile_nickname
+            scope: profile_nickname, account_email
             client-name: Kakao
             authorization-grant-type: authorization_code
             redirect-uri: '{baseUrl}/login/oauth2/code/kakao'
