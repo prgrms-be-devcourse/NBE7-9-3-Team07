@@ -63,9 +63,6 @@ dependencies {
 
     // 이메일 인증
     implementation("org.springframework.boot:spring-boot-starter-mail")
-    
-    // Redis
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 }
 
 kotlin {
