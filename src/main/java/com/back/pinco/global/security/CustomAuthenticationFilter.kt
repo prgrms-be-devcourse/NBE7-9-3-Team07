@@ -132,9 +132,9 @@ class CustomAuthenticationFilter(
         res.contentType = "application/json;charset=UTF-8"
         res.writer.write(
             """
-                {"errorCode":"%s","msg":"%s"}
+                {"errorCode":"${ec.code}","msg":"${ec.message}"}
                 
-            """.trimIndent().formatted(ec.code, ec.message)
+            """.trimIndent()
         )
         res.writer.flush()
     }

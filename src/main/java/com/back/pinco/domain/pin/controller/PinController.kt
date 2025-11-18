@@ -3,9 +3,9 @@ package com.back.pinco.domain.pin.controller
 import com.back.pinco.domain.bookmark.dto.BookmarkDto
 import com.back.pinco.domain.bookmark.dto.AddBookmarkRequest
 import com.back.pinco.domain.bookmark.service.BookmarkService
-import com.back.pinco.domain.likes.dto.PinLikedUserResponse
+import com.back.pinco.domain.likes.dto.LikedUserResponse
+import com.back.pinco.domain.likes.dto.LikeStatusResponse
 import com.back.pinco.domain.likes.dto.PinLikesRequest
-import com.back.pinco.domain.likes.dto.PinLikesResponse
 import com.back.pinco.domain.likes.service.LikesService
 import com.back.pinco.domain.pin.dto.CreatePinRequest
 import com.back.pinco.domain.pin.dto.PinDto
@@ -252,8 +252,7 @@ class PinController(
 
         return RsData(
             "200",
-            "성공적으로 처리되었습니다",
-            null
+            "성공적으로 처리되었습니다"
         )
     }
 
@@ -269,7 +268,7 @@ class PinController(
         @Valid
         reqbody: PinLikesRequest
 
-    ): RsData<PinLikesResponse> =
+    ): RsData<LikeStatusResponse> =
         RsData(
             "200",
             "성공적으로 처리되었습니다",
@@ -288,7 +287,7 @@ class PinController(
         @Valid
         reqbody: PinLikesRequest
 
-    ): RsData<PinLikesResponse> =
+    ): RsData<LikeStatusResponse> =
         RsData(
             "200",
             "성공적으로 처리되었습니다",
@@ -302,8 +301,7 @@ class PinController(
     fun getUsersWhoLikedPin(
         @PathVariable("pinId")
         pinId: Long
-
-    ): RsData<List<PinLikedUserResponse>> =
+    ): RsData<List<LikedUserResponse>> =
         RsData(
             "200",
             "성공적으로 처리되었습니다",
