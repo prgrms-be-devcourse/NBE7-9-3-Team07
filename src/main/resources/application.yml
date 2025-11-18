@@ -4,6 +4,13 @@ spring:
     username: user
     password: password
     driver-class-name: org.postgresql.Driver
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: password
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
