@@ -13,6 +13,7 @@ enum class ErrorCode(
     // 공통 0000번대
     SUCCESS(200, HttpStatus.OK, "성공적으로 처리되었습니다."),
     INVALID_VALUE(400, HttpStatus.BAD_REQUEST, "입력값이 잘못되었습니다."),
+    INTERNAL_SERVER_ERROR(500, HttpStatus.INTERNAL_SERVER_ERROR, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
 
     // PIN 도메인_1000번대
     INVALID_PIN_INPUT(1001, HttpStatus.BAD_REQUEST, "잘못된 핀 입력값입니다."),
@@ -43,6 +44,9 @@ enum class ErrorCode(
     AUTH_REQUIRED(2014, HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
     TOKEN_EXPIRED(2015, HttpStatus.UNAUTHORIZED, "Access Token이 만료되었습니다."),
     ACCESS_DENIED(2016, HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
+    VERIFICATION_CODE_NOT_FOUND(2017, HttpStatus.BAD_REQUEST, "인증 코드가 존재하지 않습니다."),
+    VERIFICATION_CODE_NOT_MATCH(2018, HttpStatus.UNAUTHORIZED, "인증 코드가 일치하지 않습니다."),
+    VERIFICATION_CODE_EXPIRED(2019, HttpStatus.UNAUTHORIZED, "인증 코드가 만료되었습니다."),
 
     // Tag 도메인_3000번대
     TAG_NOT_FOUND(3001, HttpStatus.NOT_FOUND, "존재하지 않는 태그입니다."),

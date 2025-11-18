@@ -41,6 +41,8 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")    // PostgreSQL JDBC 드라이버
     implementation("org.hibernate.orm:hibernate-spatial")   // PostGIS 및 공간 데이터 처리
 
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
@@ -58,6 +60,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+
+    // 이메일 인증
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 }
 
 kotlin {

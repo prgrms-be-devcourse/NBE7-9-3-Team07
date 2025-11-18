@@ -7,6 +7,7 @@ import com.back.pinco.domain.user.dto.UserReqBody.DeleteRequest
 import com.back.pinco.domain.user.dto.UserReqBody.EditRequest
 import com.back.pinco.domain.user.dto.UserReqBody.JoinRequest
 import com.back.pinco.domain.user.dto.UserReqBody.LoginRequest
+import com.back.pinco.domain.user.dto.UserReqBody.SendVerificationCodeRequest
 import com.back.pinco.domain.user.dto.UserResBody.*
 import com.back.pinco.domain.user.service.AuthService
 import com.back.pinco.domain.user.service.UserService
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "User", description = "회원 관리 기능")
@@ -33,12 +35,25 @@ class UserController(
 ) {
 
 
-    @Operation(summary = "회원 가입", description = "이메일, 회원이름, 비밀번호를 입력받아 회원가입합니다.")
+    @Operation(summary = "인증코드 발송", description = "이메일로 6자리 인증코드를 발송합니다.")
+    @PostMapping("/send-verification-code")
+    fun sendVerificationCode(
+        @RequestBody reqBody: SendVerificationCodeRequest
+    ): RsData<Map<String, String>> {
+        authService.sendVerificationCode(reqBody.email)
+        return RsData(
+            "200",
+            "인증코드가 발송되었습니다.",
+            null
+        )
+    }
+
+    @Operation(summary = "회원 가입", description = "이메일, 회원이름, 비밀번호, 인증코드를 입력받아 회원가입합니다.")
     @PostMapping("/join")
     fun join(
         @RequestBody reqBody: JoinRequest
     ): RsData<JoinResponse> {
-        val user = userService.createUser(reqBody.email, reqBody.password, reqBody.userName)
+        val user = userService.createUser(reqBody.email, reqBody.password, reqBody.userName, reqBody.verificationCode)
         val apiKey = userService.ensureApiKey(user)
         val access = authService.genAccessToken(user)
         val refresh = authService.genRefreshToken(user)
