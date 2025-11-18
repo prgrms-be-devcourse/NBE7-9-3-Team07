@@ -37,13 +37,9 @@ class BookmarkService(
         val pin = pinService.findById(pinId, user)
 
         val bookmark: Bookmark = bookmarkRepository.findByUserAndPin(user, pin)?.run {
-            // (this == Bookmark)
-            if (!deleted) {
-                // 삭제되지 않은 북마크가 있다면 예외처리(중복 생성 방지)
-                throw ServiceException(ErrorCode.BOOKMARK_ALREADY_EXISTS)
-            }
+            // 삭제되지 않은 북마크가 있다면 예외처리(중복 생성 방지)
+            throw ServiceException(ErrorCode.BOOKMARK_ALREADY_EXISTS)
             // 삭제 상태라면 복원
-            restore()
             this
         } ?: run {
             Bookmark(user, pin)
@@ -65,7 +61,7 @@ class BookmarkService(
             .orElseThrow { ServiceException(ErrorCode.BOOKMARK_INVALID_USER_INPUT) }
 
         // 삭제되지 않은 북마크 목록만 조회
-        val bookmarks: List<Bookmark> = bookmarkRepository.findByUserAndDeletedFalse(user)
+        val bookmarks: List<Bookmark> = bookmarkRepository.findByUser(user)
 
         return bookmarks.map { BookmarkDto(it) }
     }
