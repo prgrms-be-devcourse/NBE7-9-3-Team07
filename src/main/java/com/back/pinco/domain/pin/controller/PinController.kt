@@ -8,6 +8,7 @@ import com.back.pinco.domain.likes.dto.LikeStatusResponse
 import com.back.pinco.domain.likes.dto.PinLikesRequest
 import com.back.pinco.domain.likes.service.LikesService
 import com.back.pinco.domain.pin.dto.CreatePinRequest
+import com.back.pinco.domain.pin.dto.PinCacheDto
 import com.back.pinco.domain.pin.dto.PinDto
 import com.back.pinco.domain.pin.dto.UpdatePinContentRequest
 import com.back.pinco.domain.pin.service.PinService
@@ -131,9 +132,9 @@ class PinController(
         @Max(180)
         lonMin: Double
 
-    ): RsData<List<PinDto>> {
+    ): RsData<List<PinCacheDto>> {
         val pins = pinService.findScreenPins(latMax, lonMax, latMin, lonMin, rq.actor)
-            .map { PinDto(it) }
+
 
         return RsData(
             "200",

@@ -179,4 +179,19 @@ interface PinRepository : JpaRepository<Pin, Long> {
     fun updatePinsToDeletedByUserId(@Param("userId") userId: Long): Int
 
 
+    @Query(
+        """
+    SELECT p.* FROM pins p
+    WHERE p.is_deleted = false
+    AND p.point && ST_MakeEnvelope(:lonMin, :latMin, :lonMax, :latMax, ${GeometryUtil.SRID})
+    """,
+        nativeQuery = true
+    )
+    fun findPinsInBoundingBox(
+        @Param("lonMin") lonMin: Double,
+        @Param("latMin") latMin: Double,
+        @Param("lonMax") lonMax: Double,
+        @Param("latMax") latMax: Double
+    ): List<Pin>
+
 }
