@@ -3,7 +3,9 @@ package com.back.pinco.domain.bookmark.repository
 import com.back.pinco.domain.bookmark.entity.Bookmark
 import com.back.pinco.domain.pin.entity.Pin
 import com.back.pinco.domain.user.entity.User
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 
 interface BookmarkRepository : JpaRepository<Bookmark, Long> {
 

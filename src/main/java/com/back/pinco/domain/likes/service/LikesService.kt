@@ -11,6 +11,7 @@ import com.back.pinco.domain.user.entity.User
 import com.back.pinco.domain.user.repository.UserRepository
 import com.back.pinco.global.exception.ErrorCode
 import com.back.pinco.global.exception.ServiceException
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -77,10 +78,9 @@ class LikesService(
 
 
     private fun validateUser(userId: Long): User =
-        // TODO: UserRepository 전환 이후 수정
-        userRepository.findById(userId).orElseThrow {
-            ServiceException(ErrorCode.LIKES_INVALID_USER_INPUT)
-        }
+        userRepository.findByIdOrNull(userId)
+            ?: throw ServiceException(ErrorCode.LIKES_INVALID_USER_INPUT)
+
 
 
     @Transactional
