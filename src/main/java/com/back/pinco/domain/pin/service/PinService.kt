@@ -10,7 +10,7 @@ import com.back.pinco.global.exception.ErrorCode
 import com.back.pinco.global.exception.ServiceException
 import com.back.pinco.global.geometry.GeoHashUtil
 import com.back.pinco.global.geometry.GeometryUtil.createPoint
-import com.back.pinco.global.redis.RedisKey
+import com.back.pinco.global.redisConfig.RedisKey
 import jakarta.transaction.Transactional
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.repository.findByIdOrNull
@@ -41,7 +41,6 @@ class PinService(
     private fun makeGeoCache(hash : String, pins : List<Pin>){
         if (! pins.isEmpty()) {
             val key =RedisKey.GEO_ID.key(hash)
-            println("geo 캐시 추가! :  키${key}")
             val pinIds = pins.map { it.id }
             GeoRedisTemplate.delete(key)
             GeoRedisTemplate.opsForList().rightPushAll(key, pinIds)
@@ -109,7 +108,6 @@ class PinService(
 
             //영역이 캐시에 있음.
             if (pinIds.isNotEmpty()) {
-
                 //캐시에서 id로 핀 조회
                 pinIds.forEach { id ->
                     val pinCache = getPinCache(id)
@@ -126,7 +124,6 @@ class PinService(
                     }
                 }
             } else {
-
                 // 3) DB 조회 후 단일 캐시와 영역 캐시 생성
                 val bbox = GeoHashUtil.boundingBoxOfGeoHash(hash)
                 val dbPins = pinRepository.findPinsInBoundingBox(bbox[0], bbox[1], bbox[2], bbox[3])

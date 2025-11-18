@@ -1,4 +1,4 @@
-package com.back.pinco.global.redis
+package com.back.pinco.global.redisConfig
 
 enum class RedisKey(val prefix: String) {
     ID_PIN("pin"),
