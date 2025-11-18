@@ -207,9 +207,9 @@ internal class TagControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("핀을 찾을 수 없습니다."))
     }
 
-    // t10: 핀의 태그 목록 조회 실패 - 연결된 태그 없음
+    // t10: 핀의 태그 목록 조회 성공 - 연결된 태그 없음
     @Test
-    @DisplayName("t10 - 핀의 태그 목록 조회 실패 (태그 없음)")
+    @DisplayName("t10 - 핀의 태그 목록 조회 성공 (태그 없음)")
     fun t10() {
         val user = userRepository.save(User("tempUser", "pw", "email@test.com"))
         val point = geometryFactory.createPoint(Coordinate(127.2, 37.4))
@@ -217,8 +217,7 @@ internal class TagControllerTest {
 
         mvc.perform(MockMvcRequestBuilders.get("/api/pins/${pin.id}/tags"))
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("3007"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("해당 핀에 연결된 태그가 없습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("200"))
     }
 
     // t11: 여러 태그 기반 핀 교집합 조회 - 성공
@@ -313,8 +312,8 @@ internal class TagControllerTest {
         )
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isNotFound())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("3007"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("해당 핀에 연결된 태그가 없습니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("3012"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("해당 태그가 달린 게시물이 없습니다."))
     }
 
     // t14: 태그는 모두 존재하지만 교집합이 없을 경우
