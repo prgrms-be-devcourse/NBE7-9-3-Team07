@@ -141,6 +141,15 @@ interface PinRepository : JpaRepository<Pin, Long> {
     SELECT p FROM Pin p
     WHERE p.id = :id
       AND p.deleted = false
+"""
+    )
+    fun finCachePinById(@Param("id") id: Long): Pin?
+
+    @Query(
+        """
+    SELECT p FROM Pin p
+    WHERE p.id = :id
+      AND p.deleted = false
       AND (p.user.id = :userId OR p.isPublic = true)
 """
     )

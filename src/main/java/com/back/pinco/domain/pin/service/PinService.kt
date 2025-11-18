@@ -30,6 +30,7 @@ class PinService(
     private fun validateUserID(actor: User?): Long =
         actor?.id ?: throw ServiceException(ErrorCode.PIN_NO_PERMISSION)
 
+
     //-----------redis-----------
     private fun makePinCache(pin : Pin){
         val key = RedisKey.ID_PIN.key(pin.id.toString())
@@ -48,7 +49,7 @@ class PinService(
     }
     private fun getPinCache(id : Long) : PinCacheDto? {
         val key = RedisKey.ID_PIN.key(id.toString())
-        return PinRedisTemplate.opsForSet().members(key)?.first()
+        return PinRedisTemplate.opsForSet().members(key)?.firstOrNull()
     }
 
     private fun getGeoCache(hash: String): List<Long>{
@@ -72,29 +73,6 @@ class PinService(
         // Geo cache 자체 삭제
         GeoRedisTemplate.delete(geoKey)
     }
-
-
-    //-----------서비스 함수-----------
-
-    fun count(): Long = pinRepository.count()
-
-
-    fun write(actor: User?, pinReqbody: CreatePinRequest): Pin {
-        val point = createPoint(pinReqbody.longitude, pinReqbody.latitude)
-        val pin = Pin(point, validateUser(actor), pinReqbody.content)
-
-        val savedPin = try {
-            pinRepository.save(pin)
-        } catch (ex: Exception) {
-            throw ServiceException(ErrorCode.PIN_CREATE_FAILED)
-        }
-
-        // Redis에서 해당 구역의 캐시를 삭제하여 다음 조회 때 가져오게 함
-        deleteCache(pin)
-
-        return savedPin
-    }
-
 
     fun findPinsByRedis(
         latMin: Double, lngMin: Double, latMax: Double, lngMax: Double
@@ -143,6 +121,50 @@ class PinService(
         return resultSet.toList()
     }
 
+    fun findPinByRedis(
+       id: Long
+    ): PinCacheDto{
+        val pinCache = getPinCache(id)
+        if(pinCache != null){
+            return pinCache
+        }
+        val pin = pinRepository.finCachePinById(id)
+        if(pin != null){
+            val dto =  PinCacheDto(pin)
+            makePinCache(pin)
+            return dto
+        }else throw ServiceException(ErrorCode.PIN_NOT_FOUND)
+
+    }
+
+    //-----------서비스 함수-----------
+
+    fun count(): Long = pinRepository.count()
+
+
+    fun write(actor: User?, pinReqbody: CreatePinRequest): Pin {
+        val point = createPoint(pinReqbody.longitude, pinReqbody.latitude)
+        val pin = Pin(point, validateUser(actor), pinReqbody.content)
+
+        val savedPin = try {
+            pinRepository.save(pin)
+        } catch (ex: Exception) {
+            throw ServiceException(ErrorCode.PIN_CREATE_FAILED)
+        }
+
+        // Redis에서 해당 구역의 캐시를 삭제하여 다음 조회 때 가져오게 함
+        deleteCache(pin)
+
+        return savedPin
+    }
+
+    fun findCachePinById(id: Long, actor: User?): PinCacheDto {
+        val cache : PinCacheDto = findPinByRedis(id)
+        if(cache.public || (actor != null && cache.userId == actor.id)) return cache
+
+        throw ServiceException(ErrorCode.PIN_NOT_FOUND)
+    }
+
     fun findById(id: Long, actor: User?): Pin {
 
         return if (actor == null) {
@@ -152,7 +174,6 @@ class PinService(
                 ?: throw ServiceException(ErrorCode.PIN_NOT_FOUND)
         }
     }
-
     fun checkId(id: Long): Boolean = pinRepository.findById(id).isPresent
 
 
@@ -180,6 +201,8 @@ class PinService(
         actor: User?
     ): List<PinCacheDto> {
         val result = findPinsByRedis(latMin, lonMin, latMax, lonMax)
+
+
         return if (actor == null) {
             result.filter { it.public }
         } else {

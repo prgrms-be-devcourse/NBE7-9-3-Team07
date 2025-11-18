@@ -64,13 +64,13 @@ class PinController(
     fun getPinById(
         @PathVariable("pinId")
         pinId: Long
-    ): RsData<PinDto> {
-        val pin = pinService.findById(pinId, rq.actor)
+    ): RsData<PinCacheDto> {
+        val pin = pinService.findCachePinById(pinId, rq.actor)
 
         return RsData(
             "200",
             "성공적으로 처리되었습니다",
-            PinDto(pin)
+            pin
         )
     }
 
