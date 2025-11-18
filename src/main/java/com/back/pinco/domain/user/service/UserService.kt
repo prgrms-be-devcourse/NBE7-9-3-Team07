@@ -277,42 +277,28 @@ class UserService(
         return bookmarkList
     }
 
-    @Transactional
-    fun findOrCreateSocialUser(email: String, nickname: String): User {
-        // 소셜 로그인으로 들어온 이메일로 사용자 조회
-        val existing = userRepository.findByEmail(email)
-        if (existing != null) {
 
-            if (existing.userName != nickname) {
-                if (!userRepository.existsByUserNameAndIdNot(nickname, existing.id!!)) {
-                    existing.userName = nickname
-                } else {
-                    // 중복이면 숫자 suffix를 붙여 고유화
-                    var candidate = nickname
-                    var i = 1
-                    while (userRepository.existsByUserNameAndIdNot(candidate, existing.id!!)) {
-                        candidate = "${nickname}${i++}"
-                    }
-                    existing.userName = candidate
-                }
-            }
-            return existing
+    private fun updateExistingSocialUser(existing: User, incomingNickname: String): User {
+        if (existing.userName != incomingNickname) {
+            existing.userName = incomingNickname
         }
+        return existing
+    }
 
-        var finalName = nickname
-        var counter = 1
-        while (userRepository.existsByUserName(finalName)) {
-            finalName = "$nickname$counter"
-            counter++
-        }
-
+    private fun createNewSocialUser(email: String, nickname: String): User {
         val randomPwd = UUID.randomUUID().toString()
         val hashed = passwordEncoder.encode(randomPwd)
-        val user = User(email, hashed, finalName)
+        val user = User(email, hashed, nickname)
         userRepository.save(user)
         ensureApiKey(user)
         return user
     }
+
+    @Transactional
+    fun findOrCreateSocialUser(email: String, nickname: String): User =
+        userRepository.findByEmail(email)
+            ?.let { updateExistingSocialUser(it, nickname) }
+            ?: createNewSocialUser(email, nickname)
 
     @Transactional
     fun modifyOrJoin(email: String, nickname: String): User =
