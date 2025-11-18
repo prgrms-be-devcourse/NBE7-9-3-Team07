@@ -147,7 +147,7 @@ export default function PinCoMainPage() {
 
         setScreenBounds(newBounds);
 
-        if (mode === "screen") loadAllPins(newBounds);
+        if (mode === "screen" || mode === "tag") loadAllPins(newBounds);
 
     };
 
@@ -168,7 +168,7 @@ export default function PinCoMainPage() {
         return () => {
             kakao.maps.event.removeListener(map, "idle", handleMapIdle);
         };
-    }, [kakaoReady, mode]);
+    }, [kakaoReady, mode, selectedTags]);
 
 
     const [showCreate, setShowCreate] = useState(false);
