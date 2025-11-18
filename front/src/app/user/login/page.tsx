@@ -57,7 +57,7 @@ export default function LoginPage() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 w-80 mx-auto mt-40"
+      className="flex flex-col gap-2 w-80 mx-auto mt-40"
     >
       <input
         type="email"
@@ -81,6 +81,18 @@ export default function LoginPage() {
         disabled={submitting}
       >
         {submitting ? "로그인 중..." : "로그인"}
+      </button>
+
+
+      <button
+        type="button"
+        onClick={() => {
+          // 백엔드에서 카카오 OAuth 시작 엔드포인트로 리다이렉트
+          window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
+        }}
+        className="bg-yellow-400 text-black rounded p-2"
+      >
+        카카오톡으로 로그인
       </button>
 
       <div className="text-sm text-gray-500 text-center mt-2">

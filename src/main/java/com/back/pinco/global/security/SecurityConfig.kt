@@ -21,7 +21,8 @@ import java.io.IOException
 @Configuration
 class SecurityConfig(
     private val customAuthenticationFilter: CustomAuthenticationFilter,
-    private val oAuth2SuccessHandler: CustomOAuth2LoginSuccessHandler
+    private val oAuth2SuccessHandler: CustomOAuth2LoginSuccessHandler,
+    private val customOAuth2UserService: CustomOAuth2UserService
 ) {
     @Bean
     @Throws(Exception::class)
@@ -40,6 +41,7 @@ class SecurityConfig(
                     .requestMatchers("/api/user/join", "/api/user/login", "/api/user/reissue").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/pins/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll() // 그 외 /api/** 는 인증 필요
+                    .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
                     .requestMatchers("/api/**").authenticated() // Swagger
                     .requestMatchers(
                         "/swagger-ui/**",
@@ -52,12 +54,13 @@ class SecurityConfig(
                     .anyRequest().permitAll()
             }
 
-            // OAuth2 로그인: 성공 시 커스텀 핸들러로 리다이렉트
-            .oauth2Login { oauth2 ->
-                oauth2.successHandler(oAuth2SuccessHandler)
-            }
 
-//            .oauth2ResourceServer { oauth2 -> }
+
+            .oauth2Login { oauth2 ->
+                oauth2
+                    .userInfoEndpoint { ui -> ui.userService(customOAuth2UserService) }
+                    .successHandler(oAuth2SuccessHandler)
+            }
 
             .exceptionHandling { ex: ExceptionHandlingConfigurer<HttpSecurity?> ->
                 ex // 인증 실패 (로그인 안함, 잘못된 apiKey 등) → 401로 통일
