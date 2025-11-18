@@ -10,10 +10,10 @@ import org.springframework.data.repository.query.Param
 interface BookmarkRepository : JpaRepository<Bookmark, Long> {
 
     /**
-     * 특정 사용자의 삭제되지 않은 북마크 목록 조회
+     * 특정 사용자의 북마크 목록 조회
      *
      * @param user 사용자 엔티티 (Non-nullable)
-     * @return 삭제되지 않은 북마크 목록 (List<Bookmark>)
+     * @return 북마크 목록 (List<Bookmark>)
      */
     fun findByUserAndDeletedFalse(user: User): MutableList<Bookmark>
 
