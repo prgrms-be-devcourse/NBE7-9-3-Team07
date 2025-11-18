@@ -65,6 +65,8 @@ class PinController(
         @PathVariable("pinId")
         pinId: Long
     ): RsData<PinCacheDto> {
+        println("로그인 : ${rq.actor}")
+
         val pin = pinService.findCachePinById(pinId, rq.actor)
 
         return RsData(
@@ -79,13 +81,11 @@ class PinController(
     @GetMapping
     fun getRadiusPins(
         @RequestParam
-        @NotNull
         @Min(-90)
         @Max(90)
         latitude: Double,
 
         @RequestParam
-        @NotNull
         @Min(-180)
         @Max(180)
         longitude: Double,
@@ -109,30 +109,27 @@ class PinController(
     @GetMapping("/screen")
     fun getRectanglePins(
         @RequestParam
-        @NotNull
         @Min(-90)
         @Max(90)
         latMax: Double,
 
         @RequestParam
-        @NotNull
         @Min(-180)
         @Max(180)
         lonMax: Double,
 
         @RequestParam
-        @NotNull
         @Min(-90)
         @Max(90)
         latMin: Double,
 
         @RequestParam
-        @NotNull
         @Min(-180)
         @Max(180)
         lonMin: Double
 
     ): RsData<List<PinCacheDto>> {
+        println("로그인 : ${rq.actor}")
         val pins = pinService.findScreenPins(latMax, lonMax, latMin, lonMin, rq.actor)
 
 

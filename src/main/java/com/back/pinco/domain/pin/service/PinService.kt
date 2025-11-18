@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.Duration
 import kotlin.collections.map
 
 @Service
@@ -37,6 +38,7 @@ class PinService(
         val dto = PinCacheDto(pin)
         PinRedisTemplate.delete(key)
         PinRedisTemplate.opsForSet().add(key, dto)
+        PinRedisTemplate.expire(key, Duration.ofMinutes(1))
     }
 
     private fun makeGeoCache(hash : String, pins : List<Pin>){
@@ -45,6 +47,8 @@ class PinService(
             val pinIds = pins.map { it.id }
             GeoRedisTemplate.delete(key)
             GeoRedisTemplate.opsForList().rightPushAll(key, pinIds)
+
+            PinRedisTemplate.expire(key, Duration.ofMinutes(1))
         }
     }
     private fun getPinCache(id : Long) : PinCacheDto? {
@@ -94,6 +98,7 @@ class PinService(
                         resultSet.add(pinCache)
                     } else {
                         val pin = pinRepository.findByIdOrNull(id)
+                        //이 부분 in절로 한번에 가져오던가 해야지...
 
                         if (pin != null) {
                             resultSet.add(PinCacheDto(pin))
@@ -161,6 +166,10 @@ class PinService(
     fun findCachePinById(id: Long, actor: User?): PinCacheDto {
         val cache : PinCacheDto = findPinByRedis(id)
         if(cache.public || (actor != null && cache.userId == actor.id)) return cache
+        println("시작")
+        println(cache.public)
+        println(actor?.id)
+        println(cache.userId)
 
         throw ServiceException(ErrorCode.PIN_NOT_FOUND)
     }
@@ -201,6 +210,9 @@ class PinService(
         actor: User?
     ): List<PinCacheDto> {
         val result = findPinsByRedis(latMin, lonMin, latMax, lonMax)
+            .filter { dto ->
+                dto.latitude < latMax && dto.latitude > latMin && dto.longitude < lonMax && dto.longitude > lonMin }
+            .sortedBy { it.id }
 
 
         return if (actor == null) {
