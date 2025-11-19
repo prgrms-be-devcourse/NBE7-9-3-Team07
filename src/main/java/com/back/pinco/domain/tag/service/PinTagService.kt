@@ -38,8 +38,7 @@ class PinTagService(
     @Transactional(readOnly = true)
     fun getTagsByPin(pinId: Long): List<Tag> {
         validatePinExists(pinId) // 핀 존재 여부 검증
-        val tags = findActiveTagsByPin(pinId) // 활성 태그 조회
-        return tags // 태그 목록 반환
+        return findActiveTagsByPin(pinId) // 활성 태그 조회
     }
 
     // 태그 삭제
@@ -130,11 +129,8 @@ class PinTagService(
     }
 
     // 활성 태그 조회
-    private fun findActiveTagsByPin(pinId: Long): List<Tag> {
-        return pinTagRepository.findAllByPin_Id(pinId)
-            .map(PinTag::tag)
-            .toList()
-    }
+    private fun findActiveTagsByPin(pinId: Long): List<Tag> =
+        pinTagRepository.findTagsByPinId(pinId)
 
     // 여러 태그로 핀 조회
     private fun findPinsByTags(keywords: List<String>): List<List<Pin>> {

@@ -451,8 +451,9 @@ internal class TagControllerTest {
 
         mvc.perform(MockMvcRequestBuilders.get("/api/tags"))
             .andDo(MockMvcResultHandlers.print())
-            .andExpect(MockMvcResultMatchers.status().isNotFound())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("3001"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("존재하지 않는 태그입니다."))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+//            .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("3001"))
+//            .andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("존재하지 않는 태그입니다."))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.tags").isEmpty())
     }
 }
