@@ -276,4 +276,31 @@ class UserService(
             .toList()
         return bookmarkList
     }
+
+
+    private fun updateExistingSocialUser(existing: User, incomingNickname: String): User {
+        if (existing.userName != incomingNickname) {
+            existing.userName = incomingNickname
+        }
+        return existing
+    }
+
+    private fun createNewSocialUser(email: String, nickname: String): User {
+        val randomPwd = UUID.randomUUID().toString()
+        val hashed = passwordEncoder.encode(randomPwd)
+        val user = User(email, hashed, nickname)
+        userRepository.save(user)
+        ensureApiKey(user)
+        return user
+    }
+
+    @Transactional
+    fun findOrCreateSocialUser(email: String, nickname: String): User =
+        userRepository.findByEmail(email)
+            ?.let { updateExistingSocialUser(it, nickname) }
+            ?: createNewSocialUser(email, nickname)
+
+    @Transactional
+    fun modifyOrJoin(email: String, nickname: String): User =
+        findOrCreateSocialUser(email, nickname)
 }

@@ -3,6 +3,7 @@ package com.back.pinco.global.rq
 import com.back.pinco.domain.user.entity.User
 import com.back.pinco.global.exception.ErrorCode
 import com.back.pinco.global.exception.ServiceException
+import com.back.pinco.global.security.UserPrincipal
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -22,7 +23,11 @@ class Rq (
                 ?.authentication
                 ?.principal
                 ?.let{
-                    it as? User
+                    when (it) {
+                        is User -> it
+                        is UserPrincipal -> it.user
+                        else -> null
+                    }
                 }
 
     // actor 반환
@@ -62,4 +67,3 @@ class Rq (
 
     fun deleteCookie(name: String) = setCookie(name, null)
 }
-
