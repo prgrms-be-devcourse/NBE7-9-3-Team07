@@ -102,11 +102,11 @@ jobs:
           echo "PostGIS connection timeout" && exit 1
       - name: 테스트 실행
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://postgis_db:5432/pinco
+          SPRING_DATASOURCE_URL: jdbc:localhost://postgis_db:5432/pinco
           SPRING_DATASOURCE_USERNAME: user
           SPRING_DATASOURCE_PASSWORD: password
           # Redis(Spring Boot 기본 설정 사용 시)
-          SPRING_DATA_REDIS_HOST: redis
+          SPRING_DATA_REDIS_HOST: localhost
           SPRING_DATA_REDIS_PORT: 6379
           SPRING_DATA_REDIS_PASSWORD: "password"
 
