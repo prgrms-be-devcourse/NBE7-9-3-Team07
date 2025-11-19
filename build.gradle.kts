@@ -43,6 +43,8 @@ dependencies {
     implementation("org.hibernate.orm:hibernate-spatial")   // PostGIS 및 공간 데이터 처리
 
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("ch.hsr:geohash:1.4.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")

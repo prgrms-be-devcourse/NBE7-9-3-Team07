@@ -141,6 +141,15 @@ interface PinRepository : JpaRepository<Pin, Long> {
     SELECT p FROM Pin p
     WHERE p.id = :id
       AND p.deleted = false
+"""
+    )
+    fun finCachePinById(@Param("id") id: Long): Pin?
+
+    @Query(
+        """
+    SELECT p FROM Pin p
+    WHERE p.id = :id
+      AND p.deleted = false
       AND (p.user.id = :userId OR p.isPublic = true)
 """
     )
@@ -178,5 +187,20 @@ interface PinRepository : JpaRepository<Pin, Long> {
     @Query("UPDATE Pin p SET p.deleted = true WHERE p.user.id = :userId AND p.deleted = false")
     fun updatePinsToDeletedByUserId(@Param("userId") userId: Long): Int
 
+
+    @Query(
+        """
+    SELECT p.* FROM pins p
+    WHERE p.is_deleted = false
+    AND p.point && ST_MakeEnvelope(:lonMin, :latMin, :lonMax, :latMax, ${GeometryUtil.SRID})
+    """,
+        nativeQuery = true
+    )
+    fun findPinsInBoundingBox(
+        @Param("lonMin") lonMin: Double,
+        @Param("latMin") latMin: Double,
+        @Param("lonMax") lonMax: Double,
+        @Param("latMax") latMax: Double
+    ): List<Pin>
 
 }
