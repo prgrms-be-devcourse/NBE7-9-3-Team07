@@ -1,0 +1,7 @@
+spring:
+  data:
+    redis:
+      host: localhost  # 로컬 실행 시 localhost 사용
+      port: 6379
+      password: password  # docker-compose.yml의 Redis 비밀번호
+      database: 0
