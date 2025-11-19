@@ -267,33 +267,13 @@ export function usePins(initialCenter: UsePinsProps, userId?: number | null) {
             return;
         }
 
-        const apiKey = localStorage.getItem("apiKey");
-        const accessToken = localStorage.getItem("accessToken");
-
-        if (!apiKey || !accessToken) {
-            console.error("❌ 토큰이 없습니다. 로그인이 필요합니다.");
-            alert("로그인이 필요합니다.");
-            return;
-        }
-
         setLoading(true);
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/bookmarks`, {
+            const data = await fetchApi<any>("/api/bookmarks", {
                 method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${apiKey} ${accessToken}`,
-                },
-                credentials: "include",
             });
 
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-
-            const data = await res.json();
-
-            const pinsOnly = extractArray(data.data).map((b: any) => b.pin ?? b);
+            const pinsOnly = extractArray(data).map((b: any) => b.pin ?? b);
             const normalized = normalizePins(pinsOnly);
 
             const pinsWithTags = await loadTagsForPins(normalized);
@@ -324,36 +304,13 @@ export function usePins(initialCenter: UsePinsProps, userId?: number | null) {
             return;
         }
 
-        const apiKey = localStorage.getItem("apiKey");
-        const accessToken = localStorage.getItem("accessToken");
-
-        if (!apiKey || !accessToken) {
-            console.error("❌ 토큰이 없습니다. 로그인이 필요합니다.");
-            alert("로그인이 필요합니다.");
-            return;
-        }
-
         setLoading(true);
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/${userId}/likespins`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${apiKey} ${accessToken}`,
-                    },
-                    credentials: "include",
-                }
-            );
+            const data = await fetchApi<any>(`/api/user/${userId}/likespins`, {
+                method: "GET",
+            });
 
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-
-            const data = await res.json();
-
-            const likedArray = extractArray(data.data);
+            const likedArray = extractArray(data);
             const normalized = normalizePins(likedArray);
 
             const pinsWithTags = await loadTagsForPins(normalized);
