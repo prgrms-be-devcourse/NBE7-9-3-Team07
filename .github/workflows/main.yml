@@ -101,6 +101,17 @@ jobs:
           done
           echo "PostGIS connection timeout" && exit 1
 
+      - name: Redis 준비 대기
+        run: |
+          echo "Waiting for Redis..."
+          for i in {1..10}; do
+            redis-cli -h redis ping && echo "Redis is ready!" && exit 0
+            echo "Waiting for Redis... ($i)"
+            sleep 3
+          done
+          echo "Redis connection timeout" && exit 1
+
+
       - name: 테스트 실행
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/pinco
@@ -129,9 +140,3 @@ jobs:
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           token: ${{ github.token }}
-
-      - name: Upload test report
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report
-          path: build/reports/tests/test
