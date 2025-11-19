@@ -106,9 +106,9 @@ jobs:
           echo "Generating .env.properties file..."
           
           애플리케이션에서 사용할 Secrets 변수 주입 (Secrets에 등록된 변수들)
-          echo "jwt.secret.key=${{ secrets.JWT_SECRET_KEY }}" >> .env.properties
+          echo "jwt.secret.key='${{ secrets.JWT_SECRET_KEY }}'" >> .env.properties
           echo "kakao.client.id=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.properties
-          echo "mail.password=${{ secrets.MAIL_PASSWORD }}" >> .env.properties
+          echo "mail.password='${{ secrets.MAIL_PASSWORD }}'" >> .env.properties
           echo "mail.username=${{ secrets.MAIL_USERNAME }}" >> .env.properties
 
       - name: 테스트 실행
