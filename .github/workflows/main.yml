@@ -133,6 +133,7 @@ jobs:
           MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          custom.jwt.secret: ${{ secrets.JWT_SECRET_KEY }}
 
         run: ./gradlew test --info
 
