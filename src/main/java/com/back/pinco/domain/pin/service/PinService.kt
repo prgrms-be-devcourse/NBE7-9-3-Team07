@@ -21,8 +21,7 @@ import kotlin.collections.map
 @Service
 class PinService(
     private val pinRepository: PinRepository,
-    private val PinRedisTemplate: RedisTemplate<String, PinCacheDto>,
-    private val GeoRedisTemplate: RedisTemplate<String, Long>
+    private val GeoRedisTemplate: RedisTemplate<String, PinCacheDto>
 ) {
 
     private fun validateUser(actor: User?): User =
@@ -33,32 +32,20 @@ class PinService(
 
 
     //-----------redis-----------
-    private fun makePinCache(pin : Pin){
-        val key = RedisKey.ID_PIN.key(pin.id.toString())
-        val dto = PinCacheDto(pin)
-        PinRedisTemplate.delete(key)
-        PinRedisTemplate.opsForSet().add(key, dto)
-        PinRedisTemplate.expire(key, Duration.ofMinutes(1))
-    }
 
-    private fun makeGeoCache(hash : String, pins : List<Pin>){
+
+    private fun makeGeoCache(hash : String, pins : List<PinCacheDto>){
         if (! pins.isEmpty()) {
             val key =RedisKey.GEO_ID.key(hash)
-            val pinIds = pins.map { it.id }
             GeoRedisTemplate.delete(key)
-            GeoRedisTemplate.opsForList().rightPushAll(key, pinIds)
-
-            PinRedisTemplate.expire(key, Duration.ofMinutes(1))
+            GeoRedisTemplate.opsForList().rightPushAll(key, pins)
+            GeoRedisTemplate.expire(key, Duration.ofMinutes(1))
         }
     }
-    private fun getPinCache(id : Long) : PinCacheDto? {
-        val key = RedisKey.ID_PIN.key(id.toString())
-        return PinRedisTemplate.opsForSet().members(key)?.firstOrNull()
-    }
 
-    private fun getGeoCache(hash: String): List<Long>{
+    private fun getGeoCache(hash: String): List<PinCacheDto>{
         val key = RedisKey.GEO_ID.key(hash)
-        val list: List<Long>? = GeoRedisTemplate.opsForList().range(key, 0, -1)
+        val list: List<PinCacheDto>? = GeoRedisTemplate.opsForList().range(key, 0, -1)
 
         return list ?: emptyList()
     }
@@ -66,13 +53,6 @@ class PinService(
         val hash = GeoHashUtil.getCoveringGeoHashe(pin.point.y, pin.point.x)
 
         val geoKey= RedisKey.GEO_ID.key(hash)
-
-        val pinIds: List<Long> = GeoRedisTemplate.opsForList().range(geoKey, 0, -1) ?: emptyList()
-
-        pinIds.forEach { id ->
-            val pinKey = RedisKey.ID_PIN.key(id.toString())
-            PinRedisTemplate.delete(pinKey)
-        }
 
         // Geo cache 자체 삭제
         GeoRedisTemplate.delete(geoKey)
@@ -86,61 +66,31 @@ class PinService(
 
         coveringHashes.forEach { hash ->
 
-            val pinIds = getGeoCache(hash)
+            val pinDtos = getGeoCache(hash)
 
             //영역이 캐시에 있음.
-            if (pinIds.isNotEmpty()) {
-                //캐시에서 id로 핀 조회
-                pinIds.forEach { id ->
-                    val pinCache = getPinCache(id)
-
-                    if (pinCache != null) {
-                        resultSet.add(pinCache)
-                    } else {
-                        val pin = pinRepository.findByIdOrNull(id)
-                        //이 부분 in절로 한번에 가져오던가 해야지...
-
-                        if (pin != null) {
-                            resultSet.add(PinCacheDto(pin))
-                            makePinCache(pin)
-                        }
-                    }
-                }
+            if (pinDtos.isNotEmpty()) {
+                pinDtos.forEach { resultSet.add(it) }
             } else {
-                // 3) DB 조회 후 단일 캐시와 영역 캐시 생성
+                // DB 조회 후 단일 캐시와 영역 캐시 생성
                 val bbox = GeoHashUtil.boundingBoxOfGeoHash(hash)
                 val dbPins = pinRepository.findPinsInBoundingBox(bbox[0], bbox[1], bbox[2], bbox[3])
+                    .map { PinCacheDto(it) }
+
+                makeGeoCache(hash, dbPins)
 
 
-                // 단일 캐시 생성
                 dbPins.forEach {
-                    resultSet.add(PinCacheDto(it))
-                    makePinCache(it)
+                    resultSet.add(it)
                 }
 
-                // 영역 캐시 생성 (ID 리스트만 저장)
-                makeGeoCache(hash, dbPins)
             }
         }
 
         return resultSet.toList()
     }
 
-    fun findPinByRedis(
-       id: Long
-    ): PinCacheDto{
-        val pinCache = getPinCache(id)
-        if(pinCache != null){
-            return pinCache
-        }
-        val pin = pinRepository.finCachePinById(id)
-        if(pin != null){
-            val dto =  PinCacheDto(pin)
-            makePinCache(pin)
-            return dto
-        }else throw ServiceException(ErrorCode.PIN_NOT_FOUND)
 
-    }
 
     //-----------서비스 함수-----------
 
@@ -163,16 +113,7 @@ class PinService(
         return savedPin
     }
 
-    fun findCachePinById(id: Long, actor: User?): PinCacheDto {
-        val cache : PinCacheDto = findPinByRedis(id)
-        if(cache.public || (actor != null && cache.userId == actor.id)) return cache
-        println("시작")
-        println(cache.public)
-        println(actor?.id)
-        println(cache.userId)
 
-        throw ServiceException(ErrorCode.PIN_NOT_FOUND)
-    }
 
     fun findById(id: Long, actor: User?): Pin {
 
@@ -270,7 +211,7 @@ class PinService(
         if (pin.user.id == actor?.id) {
             try {
                 pin.togglePublic()
-                makePinCache(pin)
+                deleteCache(pin)
             } catch (_: Exception) {
                 throw ServiceException(ErrorCode.PIN_UPDATE_FAILED)
             }

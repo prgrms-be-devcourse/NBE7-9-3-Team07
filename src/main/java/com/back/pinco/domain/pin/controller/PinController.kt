@@ -11,6 +11,7 @@ import com.back.pinco.domain.pin.dto.CreatePinRequest
 import com.back.pinco.domain.pin.dto.PinCacheDto
 import com.back.pinco.domain.pin.dto.PinDto
 import com.back.pinco.domain.pin.dto.UpdatePinContentRequest
+import com.back.pinco.domain.pin.entity.Pin
 import com.back.pinco.domain.pin.service.PinService
 import com.back.pinco.domain.user.entity.User
 import com.back.pinco.domain.user.service.UserService
@@ -64,15 +65,15 @@ class PinController(
     fun getPinById(
         @PathVariable("pinId")
         pinId: Long
-    ): RsData<PinCacheDto> {
+    ): RsData<PinDto> {
         println("로그인 : ${rq.actor}")
 
-        val pin = pinService.findCachePinById(pinId, rq.actor)
+        val pin = pinService.findById(pinId, rq.actor)
 
         return RsData(
             "200",
             "성공적으로 처리되었습니다",
-            pin
+            PinDto(pin)
         )
     }
 
