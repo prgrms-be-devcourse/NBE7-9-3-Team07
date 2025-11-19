@@ -174,11 +174,18 @@ export const apiDeleteBookmark = (bookmarkId: number) => {
 };
 
 // ---------- User ----------
-export const apiJoin = (email: string, password: string, userName: string) =>
+export const apiSendVerificationCode = (email: string) =>
+  fetchApi<void>(`/api/user/send-verification-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+export const apiJoin = (email: string, password: string, userName: string, verificationCode: string) =>
   fetchApi<void>(`/api/user/join`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, userName }),
+    body: JSON.stringify({ email, password, userName, verificationCode }),
   });
 
 export const apiDeleteAccount = (password: string) =>
