@@ -95,7 +95,7 @@ jobs:
         run: |
           echo "Waiting for PostGIS to be ready..."
           for i in {1..30}; do
-            pg_isready -h postgis_db -U user -d pinco && echo "PostGIS is ready!" && exit 0
+            pg_isready -h localhost -U user -d pinco && echo "PostGIS is ready!" && exit 0
             echo "Waiting for DB... ($i)"
             sleep 3
           done
