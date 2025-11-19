@@ -39,7 +39,6 @@ class PinTagService(
     fun getTagsByPin(pinId: Long): List<Tag> {
         validatePinExists(pinId) // 핀 존재 여부 검증
         val tags = findActiveTagsByPin(pinId) // 활성 태그 조회
-        validateTagList(tags) // 결과 검증
         return tags // 태그 목록 반환
     }
 
@@ -149,9 +148,6 @@ class PinTagService(
         tagRepository.findByKeyword(keyword) ?:throw ServiceException(ErrorCode.TAG_NOT_FOUND)
 
         val pins = pinTagRepository.findPinsByTagKeyword(keyword)
-        if (pins.isEmpty()) {
-            throw ServiceException(ErrorCode.PIN_TAG_LIST_EMPTY)
-        }
         return pins
     }
 

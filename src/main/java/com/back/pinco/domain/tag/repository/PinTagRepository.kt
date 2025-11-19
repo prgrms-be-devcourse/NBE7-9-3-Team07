@@ -19,6 +19,6 @@ interface PinTagRepository : JpaRepository<PinTag, Long> {
                 "JOIN pt.tag t " +
                 "WHERE t.keyword = :keyword")
     )
-    fun findPinsByTagKeyword(@Param("keyword") keyword: String?): List<Pin>
+    fun findPinsByTagKeyword(@Param("keyword") keyword: String): List<Pin>
 }
 
