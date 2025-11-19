@@ -118,33 +118,23 @@ export const apiDeletePin = (id: number) =>
 
 // ✅ 좋아요 추가
 export const apiAddLike = async (pinId: number, userId: number) => {
-  const apiKey = localStorage.getItem("apiKey");
-  const accessToken = localStorage.getItem("accessToken");
-
-  if (!apiKey || !accessToken) {
-      console.error("❌ 토큰이 없습니다. 로그인이 필요합니다.");
-      alert("로그인이 필요합니다.");
-      return;
-  }
   const res:LikesStatusDto = await fetchApi(`/api/pins/${pinId}/likes`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey} ${accessToken}` },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId }),
   });
 
-    if (res) return res; // ✅ { data: { isLiked, likeCount } }
+  if (res) return res; // ✅ { data: { isLiked, likeCount } }
 };
 
 // ✅ 좋아요 취소
 export const apiRemoveLike = async (pinId: number, userId: number) => {
-  const apiKey = localStorage.getItem("apiKey");
-  const accessToken = localStorage.getItem("accessToken");
   const res:LikesStatusDto = await fetchApi(`/api/pins/${pinId}/likes`, {
     method: "DELETE",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey} ${accessToken}` },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId }),
   });
-    if (res) return res; // ✅ { data: { isLiked, likeCount } }
+  if (res) return res; // ✅ { data: { isLiked, likeCount } }
 };
 
 export const apiGetLikeUsers = (pinId: number) =>
