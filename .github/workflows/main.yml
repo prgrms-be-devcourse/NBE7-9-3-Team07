@@ -107,8 +107,14 @@ jobs:
           SPRING_DATASOURCE_USERNAME: user
           SPRING_DATASOURCE_PASSWORD: password
           # Redis(Spring Boot 기본 설정 사용 시)
-          SPRING_DATA_REDIS_HOST: localhost
+          SPRING_DATA_REDIS_HOST: redis
           SPRING_DATA_REDIS_PORT: 6379
+          SPRING_DATA_REDIS_PASSWORD: "password"
+
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: ./gradlew test --info
 
       - name: 테스트 결과를 PR에 코멘트로 등록
@@ -123,3 +129,9 @@ jobs:
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           token: ${{ github.token }}
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: build/reports/tests/test
