@@ -109,6 +109,11 @@ jobs:
           # Redis(Spring Boot 기본 설정 사용 시)
           SPRING_DATA_REDIS_HOST: localhost
           SPRING_DATA_REDIS_PORT: 6379
+
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          jWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: ./gradlew test --info
 
       - name: 테스트 결과를 PR에 코멘트로 등록
