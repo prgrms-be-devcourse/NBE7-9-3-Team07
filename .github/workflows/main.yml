@@ -42,7 +42,7 @@ jobs:
           KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
           MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: ./gradlew clean assemble --info
 
       - name: 빌드 아티팩트 업로드
@@ -111,7 +111,7 @@ jobs:
           echo "Generating .env.properties file..."
           
           # 1. Secrets 변수 주입 
-          echo "jwt.secret.key='${{ secrets.JWT_SECRET_KEY }}'" >> .env.properties
+          echo "jwt.secret.key='${{ secrets.SECRET_KEY }}'" >> .env.properties
           echo "kakao.client.id=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.properties
           echo "mail.password='${{ secrets.MAIL_PASSWORD }}'" >> .env.properties
           echo "mail.username=${{ secrets.MAIL_USERNAME }}" >> .env.properties
@@ -132,8 +132,7 @@ jobs:
           KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
           MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          custom.jwt.secret: ${{ secrets.SECRET_KEY }}
+          SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
         run: ./gradlew test --info
 
