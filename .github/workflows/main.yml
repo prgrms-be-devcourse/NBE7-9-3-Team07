@@ -45,6 +45,7 @@ jobs:
         with:
           name: build-artifact
           path: build/libs/
+
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -60,6 +61,16 @@ jobs:
           - 5432:5432
         options: >-
           --health-cmd="pg_isready -U user -d pinco"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -95,6 +106,9 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/pinco
           SPRING_DATASOURCE_USERNAME: user
           SPRING_DATASOURCE_PASSWORD: password
+          # Redis(Spring Boot 기본 설정 사용 시)
+          SPRING_DATA_REDIS_HOST: localhost
+          SPRING_DATA_REDIS_PORT: 6379
         run: ./gradlew test --info
 
       - name: 테스트 결과를 PR에 코멘트로 등록

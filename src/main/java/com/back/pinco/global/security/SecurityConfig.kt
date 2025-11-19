@@ -19,8 +19,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException
 
 @Configuration
-class SecurityConfig (
-    private val customAuthenticationFilter: CustomAuthenticationFilter
+class SecurityConfig(
+    private val customAuthenticationFilter: CustomAuthenticationFilter,
+    private val oAuth2SuccessHandler: CustomOAuth2LoginSuccessHandler,
+    private val customOAuth2UserService: CustomOAuth2UserService
 ) {
     @Bean
     @Throws(Exception::class)
@@ -36,9 +38,10 @@ class SecurityConfig (
             .authorizeHttpRequests { auth ->
                     auth // CORS preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 공개 API
-                        .requestMatchers("/api/user/join", "/api/user/login", "/api/user/reissue").permitAll()
+                        .requestMatchers("/api/user/join", "/api/user/login", "/api/user/reissue", "/api/user/send-verification-code").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/pins/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll() // 그 외 /api/** 는 인증 필요
+                        .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
                         .requestMatchers("/api/**").authenticated() // Swagger
                         .requestMatchers(
                             "/swagger-ui/**",
@@ -48,8 +51,16 @@ class SecurityConfig (
                             "/webjars/**"
                         ).permitAll() // 나머지는 전부 허용
 
-                        .anyRequest().permitAll()
-                }
+                    .anyRequest().permitAll()
+            }
+
+
+
+            .oauth2Login { oauth2 ->
+                oauth2
+                    .userInfoEndpoint { ui -> ui.userService(customOAuth2UserService) }
+                    .successHandler(oAuth2SuccessHandler)
+            }
 
             .exceptionHandling { ex: ExceptionHandlingConfigurer<HttpSecurity?> ->
                 ex // 인증 실패 (로그인 안함, 잘못된 apiKey 등) → 401로 통일

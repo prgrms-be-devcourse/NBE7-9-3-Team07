@@ -34,14 +34,20 @@ class CustomAuthenticationFilter(
             return
         }
 
-        // /api/pins 와 /api/pins/** GET은 공개
-        if (method.equals("GET", ignoreCase = true) && (uri == "/api/pins" || uri.startsWith("/api/pins/"))) {
+//        // /api/pins 와 /api/pins/** GET은 공개
+//        if (method.equals("GET", ignoreCase = true) && (uri == "/api/pins" || uri.startsWith("/api/pins/"))) {
+//            chain.doFilter(req, res)
+//            return
+//        } -> 버로 통과시키면 전부 비로그인 상태가 되니까 제거 (추후 로그인 따라서 조회함)
+
+        // 공개 경로면 통과 (인증 불필요)
+        if (PERMIT_PATHS.contains(uri)) {
             chain.doFilter(req, res)
             return
         }
 
-        // /api/* 가 아니거나 공개 경로면 통과
-        if (!uri.startsWith("/api/") || PERMIT_PATHS.contains(uri)) {
+        // /api/* 가 아니면 통과
+        if (!uri.startsWith("/api/")) {
             chain.doFilter(req, res)
             return
         }
@@ -143,7 +149,8 @@ class CustomAuthenticationFilter(
         private val PERMIT_PATHS = listOf(
             "/api/user/join",
             "/api/user/login",
-            "/api/user/reissue"
+            "/api/user/reissue",
+            "/api/user/send-verification-code"
         )
     }
 }
