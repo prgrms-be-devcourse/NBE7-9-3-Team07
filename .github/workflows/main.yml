@@ -110,16 +110,6 @@ jobs:
           echo "kakao.client.id=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.properties
           echo "mail.password=${{ secrets.MAIL_PASSWORD }}" >> .env.properties
           echo "mail.username=${{ secrets.MAIL_USERNAME }}" >> .env.properties
-          
-          테스트용 PostGIS 설정 주입 (services 블록 정보 활용)
-          echo "spring.datasource.url=jdbc:postgresql://localhost:5432/pinco" >> .env.properties
-          echo "spring.datasource.username=user" >> .env.properties
-          echo "spring.datasource.password=password" >> .env.properties
-          
-          테스트용 Redis 설정 주입 (services 블록 정보 활용)
-          echo "spring.data.redis.host=localhost" >> .env.properties
-          echo "spring.data.redis.port=6379" >> .env.properties
-
 
       - name: 테스트 실행
         env:
