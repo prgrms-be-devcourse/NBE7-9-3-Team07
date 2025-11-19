@@ -34,7 +34,6 @@ class UserController(
     private val rq: Rq
 ) {
 
-
     @Operation(summary = "인증코드 발송", description = "이메일로 6자리 인증코드를 발송합니다.")
     @PostMapping("/send-verification-code")
     fun sendVerificationCode(
