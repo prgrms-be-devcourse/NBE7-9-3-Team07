@@ -18,7 +18,6 @@ class TagService(private val tagRepository: TagRepository) {
         ====================================================== */
     fun getAllTags(): List<Tag> {
         val tags = findAllTags() // 태그 전체 조회
-        validateTagList(tags) // 결과 검증
         return tags // 반환
     }
 
