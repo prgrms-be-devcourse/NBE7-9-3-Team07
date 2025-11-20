@@ -38,6 +38,11 @@ jobs:
         run: chmod +x gradlew
 
       - name: Gradle 빌드 수행
+        env:
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: ./gradlew clean assemble --info
 
       - name: 빌드 아티팩트 업로드
@@ -106,7 +111,7 @@ jobs:
           echo "Generating .env.properties file..."
           
           # 1. Secrets 변수 주입 
-          echo "jwt.secret.key='${{ secrets.JWT_SECRET_KEY }}'" >> .env.properties
+          echo "jwt.secret.key='${{ secrets.SECRET_KEY }}'" >> .env.properties
           echo "kakao.client.id=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.properties
           echo "mail.password='${{ secrets.MAIL_PASSWORD }}'" >> .env.properties
           echo "mail.username=${{ secrets.MAIL_USERNAME }}" >> .env.properties
@@ -119,9 +124,16 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/pinco
           SPRING_DATASOURCE_USERNAME: user
           SPRING_DATASOURCE_PASSWORD: password
-          # Redis(Spring Boot 기본 설정 사용 시)
+
           SPRING_DATA_REDIS_HOST: localhost
           SPRING_DATA_REDIS_PORT: 6379
+
+          # 환경 변수 전달 (메일/카카오/시크릿 등)
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+
         run: ./gradlew test --info
 
       - name: 테스트 결과를 PR에 코멘트로 등록

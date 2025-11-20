@@ -44,8 +44,8 @@ export default function EditMyInfoPage() {
       return;
     }
 
-    // ✅ 서버에 보낼 payload 구성
-    const payload: Record<string, unknown> = { password };
+    // ✅ 서버에 보낼 payload 구성 (newUserName, newPassword는 선택적 - 값이 있을 때만 전송)
+    const payload: Record<string, string> = { password };
     if (newUserName.trim()) payload.newUserName = newUserName.trim();
     if (newPassword) payload.newPassword = newPassword;
 
