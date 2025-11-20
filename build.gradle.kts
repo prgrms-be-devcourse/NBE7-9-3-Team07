@@ -34,12 +34,17 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.postgresql:postgresql")    // PostgreSQL JDBC 드라이버
     implementation("org.hibernate.orm:hibernate-spatial")   // PostGIS 및 공간 데이터 처리
+
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("ch.hsr:geohash:1.4.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
@@ -55,6 +60,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+
+    // 이메일 인증
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 }
 
 kotlin {

@@ -41,10 +41,10 @@ class InitData(
         val baseLat = 37.5665 // 서울시청 기준 위도
         val baseLng = 126.9780 // 서울시청 기준 경도
 
-        // 유저 생성
-        val user1 = userService.createUser("user1@example.com", "12345678", "유저1")
-        val user2 = userService.createUser("user2@example.com", "12341234", "유저2")
-        val user3 = userService.createUser("no@example.com", "12345678", "노미경")
+        // 유저 생성 (테스트 데이터용 - 인증코드 검증 없이 생성)
+        val user1 = userService.createUserWithoutVerification("user1@example.com", "12345678", "유저1")
+        val user2 = userService.createUserWithoutVerification("user2@example.com", "12341234", "유저2")
+        val user3 = userService.createUserWithoutVerification("no@example.com", "12345678", "노미경")
 
         // 반복되는 id!! 호출을 줄이기 위해 유저 ID를 미리 추출
         val u1Id = user1.id!!

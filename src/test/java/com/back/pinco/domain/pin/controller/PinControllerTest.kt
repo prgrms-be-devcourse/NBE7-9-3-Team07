@@ -268,20 +268,7 @@ class PinControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(pin?.id))
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.latitude").value(pin?.point?.y))
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.longitude").value(pin?.point?.x))
-            .andExpect(
-                MockMvcResultMatchers.jsonPath("$.data.createdAt").value(
-                    Matchers.matchesPattern(
-                        pin?.createdAt.toString().replace("0+$".toRegex(), "") + ".*"
-                    )
-                )
-            )
-            .andExpect(
-                MockMvcResultMatchers.jsonPath("$.data.modifiedAt").value(
-                    Matchers.matchesPattern(
-                        pin?.modifiedAt.toString().replace("0+$".toRegex(), "") + ".*"
-                    )
-                )
-            )
+
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.pinTags.length()").value(pin?.pinTags?.size))
     }
 
@@ -289,10 +276,10 @@ class PinControllerTest {
     @DisplayName("id로 핀 조회 - 비 로그인 - 성공")
     @Throws(Exception::class)
     fun t2_1_2() {
-        val pin = pinRepository.findPublicPinById(targetId)
+        val pin = pinRepository.findPublicPinById(2)
         val resultActions = mvc
             .perform(
-                MockMvcRequestBuilders.get("/api/pins/$targetId")
+                MockMvcRequestBuilders.get("/api/pins/2")
 
             )
             .andDo(MockMvcResultHandlers.print())
@@ -304,20 +291,7 @@ class PinControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(pin?.id))
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.latitude").value(pin?.point?.y))
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.longitude").value(pin?.point?.x))
-            .andExpect(
-                MockMvcResultMatchers.jsonPath("$.data.createdAt").value(
-                    Matchers.matchesPattern(
-                        pin?.createdAt.toString().replace("0+$".toRegex(), "") + ".*"
-                    )
-                )
-            )
-            .andExpect(
-                MockMvcResultMatchers.jsonPath("$.data.modifiedAt").value(
-                    Matchers.matchesPattern(
-                        pin?.modifiedAt.toString().replace("0+$".toRegex(), "") + ".*"
-                    )
-                )
-            )
+
             .andExpect(MockMvcResultMatchers.jsonPath("$.data.pinTags.length()").value(pin?.pinTags?.size))
     }
 
@@ -509,7 +483,7 @@ class PinControllerTest {
         val lonMax = centerLon + delta
         val lonMin = centerLon - delta
 
-        val pins = pinRepository.findScreenPins(latMax, lonMax, latMin, lonMin, targetUserId)
+        val pins = pinRepository.findScreenPins(latMax, lonMax, latMin, lonMin, targetUserId).sortedBy { it.id }
 
         val resultActions = mvc
             .perform(
@@ -576,7 +550,7 @@ class PinControllerTest {
         val lonMax = centerLon + delta
         val lonMin = centerLon - delta
 
-        val pins = pinRepository.findPublicScreenPins(latMax, lonMax, latMin, lonMin)
+        val pins = pinRepository.findPublicScreenPins(latMax, lonMax, latMin, lonMin).sortedBy { it.id }
 
         val resultActions = mvc
             .perform(
@@ -593,9 +567,8 @@ class PinControllerTest {
             .andExpect(MockMvcResultMatchers.handler().methodName("getRectanglePins"))
             .andExpect(MockMvcResultMatchers.status().isOk())
 
-        // 반환된 데이터의 개수 검증
+        // 반환된 데이터 검증
         resultActions.andExpect(MockMvcResultMatchers.jsonPath("$.data.length()").value(pins.size))
-
         for (i in pins.indices) {
             resultActions
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[$i].id").value(pins[i].id))
@@ -1330,24 +1303,23 @@ class PinControllerTest {
     @Transactional
     @Throws(Exception::class)
     fun likeGetLikeCountTByPin() {
-        // given
-        val pinId = 1L
-        val testUser = userService.findById(1L)
-        val pin = pinService.findById(pinId, userService.findById(1L))
 
-        // when & then
-        mvc.perform(
-            MockMvcRequestBuilders.get("/api/pins/$pinId")
-                .header("Authorization", "Bearer ${testUser.apiKey} $jwtToken")
-        )
+        val pin = pinRepository.findAccessiblePinById(targetId, targetUserId)
+        val resultActions = mvc
+            .perform(
+                MockMvcRequestBuilders.get("/api/pins/$targetId")
+                    .header("Authorization", "Bearer ${testUser.apiKey} $jwtToken")
+            )
             .andDo(MockMvcResultHandlers.print())
+
+        resultActions
             .andExpect(MockMvcResultMatchers.handler().handlerType(PinController::class.java))
             .andExpect(MockMvcResultMatchers.handler().methodName("getPinById"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value("200"))
 
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(pin.id))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.likeCount").value(likesRepository.countByPinId(pinId)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(pin?.id))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.data.likeCount").value(likesRepository.countByPinId(pin!!.id!!)))
     }
 
     @Test

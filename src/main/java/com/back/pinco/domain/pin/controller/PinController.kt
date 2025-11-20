@@ -8,8 +8,10 @@ import com.back.pinco.domain.likes.dto.LikeStatusResponse
 import com.back.pinco.domain.likes.dto.PinLikesRequest
 import com.back.pinco.domain.likes.service.LikesService
 import com.back.pinco.domain.pin.dto.CreatePinRequest
+import com.back.pinco.domain.pin.dto.PinCacheDto
 import com.back.pinco.domain.pin.dto.PinDto
 import com.back.pinco.domain.pin.dto.UpdatePinContentRequest
+import com.back.pinco.domain.pin.entity.Pin
 import com.back.pinco.domain.pin.service.PinService
 import com.back.pinco.domain.user.entity.User
 import com.back.pinco.domain.user.service.UserService
@@ -64,6 +66,8 @@ class PinController(
         @PathVariable("pinId")
         pinId: Long
     ): RsData<PinDto> {
+        println("로그인 : ${rq.actor}")
+
         val pin = pinService.findById(pinId, rq.actor)
 
         return RsData(
@@ -78,13 +82,11 @@ class PinController(
     @GetMapping
     fun getRadiusPins(
         @RequestParam
-        @NotNull
         @Min(-90)
         @Max(90)
         latitude: Double,
 
         @RequestParam
-        @NotNull
         @Min(-180)
         @Max(180)
         longitude: Double,
@@ -108,32 +110,29 @@ class PinController(
     @GetMapping("/screen")
     fun getRectanglePins(
         @RequestParam
-        @NotNull
         @Min(-90)
         @Max(90)
         latMax: Double,
 
         @RequestParam
-        @NotNull
         @Min(-180)
         @Max(180)
         lonMax: Double,
 
         @RequestParam
-        @NotNull
         @Min(-90)
         @Max(90)
         latMin: Double,
 
         @RequestParam
-        @NotNull
         @Min(-180)
         @Max(180)
         lonMin: Double
 
-    ): RsData<List<PinDto>> {
+    ): RsData<List<PinCacheDto>> {
+        println("로그인 : ${rq.actor}")
         val pins = pinService.findScreenPins(latMax, lonMax, latMin, lonMin, rq.actor)
-            .map { PinDto(it) }
+
 
         return RsData(
             "200",
