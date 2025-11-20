@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
     indexes = [
         Index(name = "idx_pin_tag_pin", columnList = "pin_id"),
         Index(name = "idx_pin_tag_tag",columnList = "tag_id"),
-        Index(name = "idx_pin_tag_deleted", columnList = "is_deleted")
+        // Index(name = "idx_pin_tag_deleted", columnList = "is_deleted")
     ]
 )
 @EntityListeners(AuditingEntityListener::class)

@@ -2,17 +2,57 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, User } from "lucide-react";
-import { apiJoin } from "@/lib/pincoApi";
+import { Mail, Lock, User, Key } from "lucide-react";
+import { apiJoin, apiSendVerificationCode } from "@/lib/pincoApi";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ userName: "", email: "", password: "" });
+  const [form, setForm] = useState({ userName: "", email: "", password: "", verificationCode: "" });
   const [loading, setLoading] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const password = e.target.value.trim();
+    if (password && password.length < 8) {
+      alert("비밀번호는 8자 이상 입력해야 합니다.");
+    }
+  };
+
+  const handleSendVerificationCode = async () => {
+    const email = form.email.trim().toLowerCase();
+    
+    if (!email) {
+      alert("이메일을 먼저 입력해주세요.");
+      return;
+    }
+
+    // 이메일 형식 간단 검증
+    if (!email.includes("@") || !email.includes(".")) {
+      alert("올바른 이메일 형식을 입력해주세요.");
+      return;
+    }
+
+    setSendingCode(true);
+    try {
+      await apiSendVerificationCode(email);
+      alert("인증코드가 발송되었습니다. 이메일을 확인해주세요.");
+      setCodeSent(true);
+    } catch (err: any) {
+      const msg = err?.message ?? "";
+      if (msg.includes("이메일 형식")) {
+        alert("이메일 형식이 올바르지 않습니다.");
+      } else {
+        alert(msg || "인증코드 발송에 실패했습니다.");
+      }
+    } finally {
+      setSendingCode(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,6 +63,7 @@ export default function SignUpPage() {
     const email = form.email.trim().toLowerCase();
     const password = form.password.trim();
     const userName = form.userName.trim();
+    const verificationCode = form.verificationCode.trim();
 
     // ⚙️ 프론트 최소 유효성
     if (password.length < 8) {
@@ -31,9 +72,15 @@ export default function SignUpPage() {
       return;
     }
 
+    if (!verificationCode) {
+      alert("인증코드를 입력해주세요.");
+      setLoading(false);
+      return;
+    }
+
     try {
       // ⚙️ 서버 요청
-      const res: any = await apiJoin(email, password, userName);
+      const res: any = await apiJoin(email, password, userName, verificationCode);
       const code = res?.resultCode ?? res?.errorCode ?? "200";
       const msg = res?.msg ?? "";
 
@@ -78,6 +125,8 @@ export default function SignUpPage() {
         alert("이미 가입된 이메일입니다. 로그인해주세요.");
       else if (raw.includes("이미 사용 중인 회원이름"))
         alert("이미 사용 중인 회원 이름입니다. 다른 이름을 입력해주세요.");
+      else if (raw.includes("인증 코드") || raw.includes("인증코드"))
+        alert(raw || "인증코드가 일치하지 않거나 만료되었습니다.");
       else alert(raw || "회원가입 중 오류가 발생했습니다 ❌");
     } finally {
       setLoading(false);
@@ -111,16 +160,48 @@ export default function SignUpPage() {
           {/* 이메일 */}
           <div className="relative">
             <Mail className="absolute left-3 top-3 text-gray-400" size={18} />
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="이메일 주소"
-              required
-              className="w-full border rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="flex gap-2">
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="이메일 주소"
+                required
+                className="flex-1 border rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-blue-500"
+                disabled={codeSent}
+              />
+              <button
+                type="button"
+                onClick={handleSendVerificationCode}
+                disabled={sendingCode || codeSent || !form.email}
+                className={`px-4 py-2 rounded-md text-sm whitespace-nowrap transition
+                  ${sendingCode || codeSent || !form.email
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-500 text-white hover:bg-blue-600"
+                  }`}
+              >
+                {sendingCode ? "발송 중..." : codeSent ? "발송 완료" : "인증번호 전송"}
+              </button>
+            </div>
           </div>
+
+          {/* 인증코드 */}
+          {codeSent && (
+            <div className="relative">
+              <Key className="absolute left-3 top-3 text-gray-400" size={18} />
+              <input
+                type="text"
+                name="verificationCode"
+                value={form.verificationCode}
+                onChange={handleChange}
+                placeholder="인증코드 6자리 입력"
+                maxLength={6}
+                required
+                className="w-full border rounded-md pl-10 pr-3 py-2 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
 
           {/* 비밀번호 */}
           <div className="relative">
@@ -130,6 +211,7 @@ export default function SignUpPage() {
               name="password"
               value={form.password}
               onChange={handleChange}
+              onBlur={handlePasswordBlur}
               placeholder="비밀번호 (8자 이상)"
               minLength={8}
               required

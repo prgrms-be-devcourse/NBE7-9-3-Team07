@@ -65,6 +65,6 @@ logging:
     org.springframework.web: DEBUG
 custom:
   jwt:
-    secret: "aVeryLongSecretKey_ChangeMe_2025!"
+    secret: ${SECRET_KEY}
     accessExpireSeconds: 1800
     refreshExpireSeconds: 86400

@@ -194,24 +194,28 @@ class UserService(
     fun findById(id: Long): User = userRepository.findById(id)
             .orElseThrow { ServiceException(ErrorCode.USER_NOT_FOUND) }
 
-    private fun nameChanged(currentUser: User, newUserName: String): Boolean =
-        newUserName.trim().isNotBlank() && newUserName.trim() != currentUser.userName
+    private fun nameChanged(currentUser: User, newUserName: String?): Boolean {
+        val trimmed = newUserName?.trim() ?: return false
+        return trimmed.isNotBlank() && trimmed != currentUser.userName
+    }
 
-    private fun passwordChanged(currentUser: User, newPassword: String): Boolean =
-        newPassword.isNotBlank() && !passwordEncoder.matches(newPassword, currentUser.password)
+    private fun passwordChanged(currentUser: User, newPassword: String?): Boolean {
+        val trimmed = newPassword?.trim() ?: return false
+        return trimmed.isNotBlank() && !passwordEncoder.matches(trimmed, currentUser.password)
+    }
 
 
     @Transactional
-    fun editUserInfo(userId: Long, newUserName: String, newPassword: String) {
+    fun editUserInfo(userId: Long, newUserName: String?, newPassword: String?) {
         val currentUser = userRepository.findById(userId)
             .orElseThrow { ServiceException(ErrorCode.USER_NOT_FOUND) }
         val nameChanged = nameChanged(currentUser, newUserName)
         val pwdChanged = passwordChanged(currentUser, newPassword)
 
         when {
-            nameChanged && pwdChanged -> editAll(currentUser, newUserName, newPassword)
-            nameChanged -> editName(currentUser, newUserName)
-            pwdChanged -> editPwd(currentUser, newPassword)
+            nameChanged && pwdChanged -> editAll(currentUser, newUserName ?: "", newPassword ?: "")
+            nameChanged -> editName(currentUser, newUserName ?: "")
+            pwdChanged -> editPwd(currentUser, newPassword ?: "")
             else -> throw ServiceException(ErrorCode.NO_FIELDS_TO_UPDATE)
         }
     }
